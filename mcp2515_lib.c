@@ -52,9 +52,10 @@ unsigned char mcp2515_read_register(unsigned char adress)
 
 unsigned char CAN_init(void)
 {
+	DDR_CAN_CS |= (1 << P_CAN_CS); //set CS to output
 	CAN_CS_LOW
 	spi_putc(SPI_RESET);
-	_delay_ms(10);
+	_delay_ms(10); //wait for chip to reset
 	CAN_CS_HIGH
 	
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
