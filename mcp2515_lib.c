@@ -59,61 +59,62 @@ unsigned char CAN_init(void)
 	_delay_ms(10); //wait for chip to reset
 	CAN_CS_HIGH
 	
+	unsigned int error = 0;
 	
 	//write to all registers using settings defined above
 	///also verify the settings
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
 	if (mcp2515_read_register(CNF1) != CNF1_Setting)
 	{
-		return(1);
+		error |= 1;
 	}
 	
 	mcp2515_write_register ( CNF2, CNF2_Setting );
 	if (mcp2515_read_register(CNF2) != CNF2_Setting)
 	{
-		return(3);
+		error |= (1 << 1);
 	}
 	
 	mcp2515_write_register ( CNF3, CNF3_Setting );
 	if (mcp2515_read_register(CNF3) != CNF3_Setting)
 	{
-		return(4);
+		error |= (1 << 2);
 	}
 	
 	mcp2515_write_register ( CANINTE, CANINTE_Setting);
 	if (mcp2515_read_register(CANINTE) != CANINTE_Setting)
 	{
-		return(5);
+		error |= (1 << 3);
 	}
 	
 	mcp2515_write_register ( RXB0CTRL, RXB0CTRL_Setting );
 	if(mcp2515_read_register(RXB0CTRL) != RXB0CTRL_Setting)
 	{
-		return(6);
+		error |= (1 << 4);
 	}
 	
 	mcp2515_write_register ( RXB1CTRL, RXB1CTRL_Setting );
 	if(mcp2515_read_register(RXB1CTRL) != RXB1CTRL_Setting )
 	{
-		return(7);
+		error |= (1 << 5);
 	}
 	
 	mcp2515_write_register ( BFPCTRL, BFPCTRL_Setting ) ;
 	if (mcp2515_read_register(BFPCTRL) != BFPCTRL_Setting)
 	{
-		return(8);
+		error |= (1 << 6);
 	}
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
 	if (mcp2515_read_register(TXRTSCTRL) != TXRTSCTRL_Setting)
 	{
-		return(9);
+		error |= (1 << 7);
 	}
 	
 	
 	mcp2515_bit_modify ( CANCTRL, 0xE0, 0 ) ; //exit configure mode
 	
-	return(0);
+	return(error);
 }
 
 void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
