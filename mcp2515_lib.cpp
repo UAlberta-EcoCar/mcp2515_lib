@@ -64,7 +64,7 @@ unsigned int mcp2515_init(void)
 	unsigned int error = 0;
 	
 	//write to all registers using settings defined above
-	///also verify the settings
+	//also verify the settings
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
 	if (mcp2515_read_register(CNF1) != CNF1_Setting)
 	{
@@ -108,7 +108,7 @@ unsigned int mcp2515_init(void)
 	}
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
-	if (mcp2515_read_register(TXRTSCTRL) != TXRTSCTRL_Setting)
+	if ((mcp2515_read_register(TXRTSCTRL) & 0x07) != TXRTSCTRL_Setting)
 	{
 		error |= (1 << 7);
 	}
@@ -119,26 +119,25 @@ unsigned int mcp2515_init(void)
 	return(error);
 }
 
-/*
+
 
 void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 
-    unsigned char length = p_message-> length; 
     // ID If the message is a "Remote Transmit Request" 
-    if ( p_message-> RTransR ) 
+    if ( p_message -> RTransR ) 
     { 
     	// An RTR message does have a length but no data 
     	// message length + RTR set         
-    	mcp2515_write_register ( TXB0DLC, ( 1 << RTR ) | length ) ; 
+    	mcp2515_write_register ( TXB0DLC, ( 1 << RTR ) | p_message -> length ) ; 
     } 
     else 
     { 
     	// Set the message length         
-    	mcp2515_write_register ( TXB0DLC, length ) ; 
+    	mcp2515_write_register ( TXB0DLC, p_message -> length ) ; 
     	// data 
-    	for ( unsigned char i = 0 ; i <length; i ++ ) 
+    	for ( unsigned char i = 0 ; i < p_message -> length; i ++ ) 
     	{             
-    		mcp2515_write_register ( TXB0D0 + i, p_message-> data [ i ] ) ; 
+    		mcp2515_write_register ( TXB0D0 + i, p_message -> data[i] ) ; 
     	} 
     } 
     // CAN Message     
@@ -147,7 +146,7 @@ void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 
     CAN_CS_HIGH
 }
 
-
+/*
 unsigned char mcp2515_read_rx_status ( void ) 
 { 
     unsigned char data; 
