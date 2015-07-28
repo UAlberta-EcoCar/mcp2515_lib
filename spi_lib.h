@@ -1,5 +1,6 @@
-#ifndef spi_lib_H
-#define spi_lib_H
+#ifndef SPI_LIB_H
+#define SPI_LIB_H
+
 
 
 #define DDR_SPI DDRB 
@@ -9,7 +10,7 @@
 #define P_SCK 5
 
 
-void SPI_init(void);
+void spi_init(void);
 unsigned char spi_putc ( unsigned char data );
 
 

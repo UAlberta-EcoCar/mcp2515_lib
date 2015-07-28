@@ -8,7 +8,7 @@
 
 #define CS_HIGH PORT_CS |= (1 << P_CS);
 #define CS_LOW PORT_CS &= (1 << P_CS);
-void SPI_init(void) 
+void spi_init(void) 
 { 
     // Enable pins for the SPI interface
     DDR_SPI |= ( 1 << P_SCK ) | ( 1 << P_MOSI ) ; 

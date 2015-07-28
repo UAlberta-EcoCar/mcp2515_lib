@@ -1,4 +1,4 @@
-#include "can_lib.h"
+#include "mcp2515_lib.h"
 #include "spi_lib.h"
 #include "mcp2515_defs.h"
 #include "mcp2515_settings.h"
@@ -51,7 +51,9 @@ unsigned char mcp2515_read_register(unsigned char adress)
     return data;
 }
 
-unsigned char CAN_init(void)
+
+
+unsigned int mcp2515_init(void)
 {
 	DDR_CAN_CS |= (1 << P_CAN_CS); //set CS to output
 	CAN_CS_LOW
@@ -117,13 +119,15 @@ unsigned char CAN_init(void)
 	return(error);
 }
 
+/*
+
 void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 
-    uint8_t length = p_message-> length; 
+    unsigned char length = p_message-> length; 
     // ID If the message is a "Remote Transmit Request" 
     if ( p_message-> RTransR ) 
     { 
-    	/* An RTR message does have a length but no data */ 
+    	// An RTR message does have a length but no data 
     	// message length + RTR set         
     	mcp2515_write_register ( TXB0DLC, ( 1 << RTR ) | length ) ; 
     } 
@@ -132,7 +136,7 @@ void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 
     	// Set the message length         
     	mcp2515_write_register ( TXB0DLC, length ) ; 
     	// data 
-    	for ( uint8_t i = 0 ; i <length; i ++ ) 
+    	for ( unsigned char i = 0 ; i <length; i ++ ) 
     	{             
     		mcp2515_write_register ( TXB0D0 + i, p_message-> data [ i ] ) ; 
     	} 
@@ -144,9 +148,9 @@ void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 
 }
 
 
-uint8_t mcp2515_read_rx_status ( void ) 
+unsigned char mcp2515_read_rx_status ( void ) 
 { 
-    uint8_t data; 
+    unsigned char data; 
     // CS of the MCP2515 on low drag     
     CAN_CS_LOW     
     spi_putc ( SPI_RX_STATUS ) ;     
@@ -163,7 +167,7 @@ CanMessage can_get_message ( void )
 { 
     CanMessage p_message; //create a message
     // read status 
-    uint8_t status = mcp2515_read_rx_status ( ) ;
+    unsigned char status = mcp2515_read_rx_status ( ) ;
     if ( bit_is_set ( status, 6 ) ) 
     { // message in buffer 0        
     PORT_CS & = ~ ( 1 << P_CS ) ;    // CS Low         
@@ -177,30 +181,31 @@ CanMessage can_get_message ( void )
     	
     } 
     else 
-    { /* Error: No new message available */ 
+    { // Error: No new message available 
     return 0xff; 
     } 
     // read standard ID     
-    p_message.id =  (uint16_t) spi_putc( 0xff ) << 3 ;     
-    p_message.id |= (uint16_t) spi_putc( 0xff ) >> 5 ;     
+    p_message.id =  (unsigned int) spi_putc( 0xff ) << 3 ;     
+    p_message.id |= (unsigned int) spi_putc( 0xff ) >> 5 ;     
     spi_putc ( 0xff ) ;     
     spi_putc ( 0xFF ) ; 
     // read length 
     p_message.length = spi_putc ( 0xff ) & 0x0f;     
     // data read 
-    for ( uint8_t i = 0 ; i <length; i ++ ) 
+    for ( unsigned char i = 0 ; i <length; i ++ ) 
     {         
     	p_message.data[i] = spi_putc ( 0xff ) ;
     }     
     CAN_CS_HIGH 
     if ( bit_is_set ( status, 3 ) ) 
     {         
-    	p_message.RTR = 1 ; 
+    	p_message.RTransR = 1 ; 
     	
     } else 
     {         
-    	p_message.RTR = 0 ;
+    	p_message.RTransR = 0 ;
     	
     } 
     return(p_message);
 }
+*/
