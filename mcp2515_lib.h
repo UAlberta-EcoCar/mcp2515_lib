@@ -14,4 +14,13 @@ unsigned char mcp2515_init(void);
 
 #define read_TXnRTS_pins (7 & (mcp2515_read_register(TXRTSCTRL) >> 3))
 
+typedef struct 
+{ 
+    uint16_t   id;
+    uint8_t    RTR;
+    uint8_t    length;
+    uint8_t    data [ 8 ] ;
+    } CanMessage; 
+
+
 #endif
