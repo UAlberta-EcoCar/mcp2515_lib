@@ -5,23 +5,32 @@
 #include <avr/io.h>
 #include <avr/delay.h>
 
+
+//to do: comments explaining each setting
 #define CNF1_Setting  (( 1 << BRP0 ) | ( 1 << BRP1 ) | ( 1 << BRP2 ) | (1 << BRP3))
 #define CNF2_Setting (( 1 << BTLMODE ) | ( 1 << PHSEG11 ))
 #define CNF3_Setting ( 1 << PHSEG21 )
 #define CANINTE_Setting (( 1 << RX1IE ) | ( 1 << RX0IE ))
 #define RXB0CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 ))
+#define RXB1CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 )) 
+#define BFPCTRL_Setting 0
+#define TXRTSCTRL_Setting 0 
 
-void mcp2515_write_register( uint8_t address, uint8_t data ) 
+void mcp2515_write_register( unsigned char address, unsigned char data ) 
 { 
     //  CS of the MCP2515 on low drag
     CAN_CS_LOW
+    //tell chip you're going to write
     spi_putc ( SPI_WRITE ) ;
-    spi_putc ( address ) ;     
-    spi_putc ( data ) ; // / CS line unlock     
+    //send address to write to
+    spi_putc ( address ) ;    
+    //send value
+    spi_putc ( data ) ; 
+    // CS line unlock     
     CAN_CS_HIGH 
 }
 
-void mcp2515_bit_modify ( uint8_t address, uint8_t mask, uint8_t data ) 
+void mcp2515_bit_modify ( unsigned char address, unsigned char mask, unsigned char data ) 
 { 
     // / CS of the MCP2515 on low drag
     CAN_CS_LOW
@@ -58,6 +67,9 @@ unsigned char CAN_init(void)
 	_delay_ms(10); //wait for chip to reset
 	CAN_CS_HIGH
 	
+	
+	//write to all registers using settings defined above
+	///also verify the settings
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
 	if (mcp2515_read_register(CNF1) != CNF1_Setting)
 	{
@@ -88,10 +100,26 @@ unsigned char CAN_init(void)
 		return(6);
 	}
 	
-	mcp2515_write_register ( RXB1CTRL, ( 1 << RXM1 ) | ( 1 << RXM0 ) );
-	mcp2515_write_register ( BFPCTRL, 0 ) ;
-	mcp2515_write_register ( TXRTSCTRL, 0 ) ;
-	mcp2515_bit_modify ( CANCTRL, 0xE0, 0 ) ;
+	mcp2515_write_register ( RXB1CTRL, RXB1CTRL_Setting );
+	if(mcp2515_read_register(RXB1CTRL) != RXB1CTRL_Setting )
+	{
+		return(7);
+	}
+	
+	mcp2515_write_register ( BFPCTRL, BFPCTRL_Setting ) ;
+	if (mcp2515_read_register(BFPCTRL) != BFPCTRL_Setting)
+	{
+		return(8);
+	}
+	
+	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
+	if (mcp2515_read_register(TXRTSCTRL) != TXRTSCTRL_Setting)
+	{
+		return(9);
+	}
+	
+	
+	mcp2515_bit_modify ( CANCTRL, 0xE0, 0 ) ; //exit configure mode
 	
 	return(0);
 }
