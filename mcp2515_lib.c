@@ -116,4 +116,90 @@ unsigned char CAN_init(void)
 	return(0);
 }
 
+void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
+{ 
+    uint8_t length = p_message-> length; 
+    // ID If the message is a "Remote Transmit Request" 
+    if ( p_message-> RTransR ) 
+    { 
+    	/* An RTR message does have a length but no data */ 
+    	// message length + RTR set         
+    	mcp2515_write_register ( TXB0DLC, ( 1 << RTR ) | length ) ; 
+    } 
+    else 
+    { 
+    	// Set the message length         
+    	mcp2515_write_register ( TXB0DLC, length ) ; 
+    	// data 
+    	for ( uint8_t i = 0 ; i <length; i ++ ) 
+    	{             
+    		mcp2515_write_register ( TXB0D0 + i, p_message-> data [ i ] ) ; 
+    	} 
+    } 
+    // CAN Message     
+    CAN_CS_LOW     
+    spi_putc ( SPI_RTS | 0x01 ) ;     
+    CAN_CS_HIGH
+}
 
+
+uint8_t mcp2515_read_rx_status ( void ) 
+{ 
+    uint8_t data; 
+    // CS of the MCP2515 on low drag     
+    CAN_CS_LOW     
+    spi_putc ( SPI_RX_STATUS ) ;     
+    data = spi_putc ( 0xFF ) ; 
+    // The data is sent again repeated , . 
+    // So you need only one of the two bytes evaluated     
+    spi_putc ( 0xff ) ; 
+    CAN_CS_HIGH
+    return data; 
+}
+
+
+CanMessage can_get_message ( void ) 
+{ 
+    CanMessage p_message; //create a message
+    // read status 
+    uint8_t status = mcp2515_read_rx_status ( ) ;
+    if ( bit_is_set ( status, 6 ) ) 
+    { // message in buffer 0        
+    PORT_CS & = ~ ( 1 << P_CS ) ;    // CS Low         
+    spi_putc ( SPI_READ_RX ) ; 
+    	
+    } 
+    else if ( bit_is_set ( status, 7 ) ) 
+    { // message in buffer 1         
+    PORT_CS & = ~ ( 1 << P_CS ) ;    // CS Low         
+    spi_putc ( SPI_READ_RX | 0x04 ) ; 
+    	
+    } 
+    else 
+    { /* Error: No new message available */ 
+    return 0xff; 
+    } 
+    // read standard ID     
+    p_message.id =  (uint16_t) spi_putc( 0xff ) << 3 ;     
+    p_message.id |= (uint16_t) spi_putc( 0xff ) >> 5 ;     
+    spi_putc ( 0xff ) ;     
+    spi_putc ( 0xFF ) ; 
+    // read length 
+    p_message.length = spi_putc ( 0xff ) & 0x0f;     
+    // data read 
+    for ( uint8_t i = 0 ; i <length; i ++ ) 
+    {         
+    	p_message.data[i] = spi_putc ( 0xff ) ;
+    }     
+    CAN_CS_HIGH 
+    if ( bit_is_set ( status, 3 ) ) 
+    {         
+    	p_message.RTR = 1 ; 
+    	
+    } else 
+    {         
+    	p_message.RTR = 0 ;
+    	
+    } 
+    return(p_message);
+}
