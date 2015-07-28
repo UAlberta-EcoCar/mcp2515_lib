@@ -1,6 +1,7 @@
 #include "can_lib.h"
 #include "spi_lib.h"
 #include "mcp2515_defs.h"
+#include "mcp2515_settings.h"
 
 #include <avr/io.h>
 #include <avr/delay.h>
