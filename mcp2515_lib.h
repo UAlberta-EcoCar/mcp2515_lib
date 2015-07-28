@@ -17,7 +17,7 @@ unsigned char mcp2515_init(void);
 typedef struct 
 { 
     uint16_t   id;
-    uint8_t    RTR;
+    uint8_t    RTransR;
     uint8_t    length;
     uint8_t    data [ 8 ] ;
     } CanMessage; 
