@@ -20,7 +20,10 @@ typedef struct
     uint8_t    RTransR;
     uint8_t    length;
     uint8_t    data [ 8 ] ;
-    } CanMessage; 
+} CanMessage; 
+
+void can_send_message ( CanMessage *p_message );
+CanMessage can_get_message ( void ) ;
 
 
 #endif
