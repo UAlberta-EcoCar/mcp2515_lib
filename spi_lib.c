@@ -1,4 +1,4 @@
-#include "SPI_lib.h"
+#include "spi_lib.h"
 #include <avr/io.h>
 #include <avr/delay.h>
 
@@ -7,7 +7,7 @@
 #define P_CS 2
 
 #define CS_HIGH PORT_CS |= (1 << P_CS);
-
+#define CS_LOW PORT_CS &= (1 << P_CS);
 void SPI_init(void) 
 { 
     // Enable pins for the SPI interface
@@ -23,7 +23,8 @@ void SPI_init(void)
 unsigned char spi_putc ( unsigned char data ) 
 { 
     // Sends a byte
-    SPDR = data; // Waits has been sent to byte 
+    SPDR = data; 
+    // Waits for byte to send 
     while ( ! ( SPSR & ( 1 << SPIF ) ) ); 
     return SPDR; 
 }
