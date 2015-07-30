@@ -2,7 +2,7 @@
 #include "spi_lib.h"
 #include "mcp2515_defs.h"
 #include "mcp2515_settings.h"
-
+#include <arduino.h>
 #include <avr/io.h>
 #include <avr/delay.h>
 
@@ -29,7 +29,8 @@ void mcp2515_bit_modify ( unsigned char address, unsigned char mask, unsigned ch
     spi_putc ( SPI_BIT_MODIFY ) ;
     spi_putc ( address ) ;
     spi_putc ( mask ) ;
-    spi_putc ( data ) ; // re-enable / CS line
+    spi_putc ( data ) ; 
+	// re-enable CS line
     CAN_CS_HIGH 
 }
 
@@ -102,7 +103,7 @@ unsigned int mcp2515_init(void)
 	}
 	
 	mcp2515_write_register ( BFPCTRL, BFPCTRL_Setting ) ;
-	if (mcp2515_read_register(BFPCTRL) != BFPCTRL_Setting)
+	if ((mcp2515_read_register(BFPCTRL) & 0x0F) != BFPCTRL_Setting)
 	{
 		error |= (1 << 6);
 	}
@@ -121,8 +122,19 @@ unsigned int mcp2515_init(void)
 
 
 
-void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
+unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 
+
+	
+	//set buffer to high priority (its the only buffer used)
+	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
+	
+	//set message id. for now only dealing with standard 11 bit id
+	//lower 3 bits of id go to bits 7-5 of register :( not nice
+	mcp2515_write_register(TXB0SIDL,(p_message -> id) << 5);
+	//bits 10-3 go to High register (a little nicer to do)
+	mcp2515_write_register(TXB0SIDH,(p_message -> id) >> 3);
+	
     // ID If the message is a "Remote Transmit Request" 
     if ( p_message -> RTransR ) 
     { 
@@ -140,13 +152,15 @@ void can_send_message ( CanMessage *p_message ) //sends message using tx buffer 
     		mcp2515_write_register ( TXB0D0 + i, p_message -> data[i] ) ; 
     	} 
     } 
-    // CAN Message     
+    // send CAN Message     
     CAN_CS_LOW     
-    spi_putc ( SPI_RTS | 0x01 ) ;     
+    spi_putc ( SPI_RTS | 0x00 ) ;  //request to send tx buffer 0   
     CAN_CS_HIGH
+	delay(10);
+	return (mcp2515_read_register(TXB0CTRL) & 0xF0); //should return 0x00
 }
 
-/*
+
 unsigned char mcp2515_read_rx_status ( void ) 
 { 
     unsigned char data; 
@@ -169,19 +183,19 @@ CanMessage can_get_message ( void )
     unsigned char status = mcp2515_read_rx_status ( ) ;
     if ( bit_is_set ( status, 6 ) ) 
     { // message in buffer 0        
-    PORT_CS & = ~ ( 1 << P_CS ) ;    // CS Low         
+	CAN_CS_LOW
     spi_putc ( SPI_READ_RX ) ; 
     	
     } 
     else if ( bit_is_set ( status, 7 ) ) 
     { // message in buffer 1         
-    PORT_CS & = ~ ( 1 << P_CS ) ;    // CS Low         
+    CAN_CS_LOW         
     spi_putc ( SPI_READ_RX | 0x04 ) ; 
     	
     } 
     else 
     { // Error: No new message available 
-    return 0xff; 
+	return p_message;
     } 
     // read standard ID     
     p_message.id =  (unsigned int) spi_putc( 0xff ) << 3 ;     
@@ -191,7 +205,7 @@ CanMessage can_get_message ( void )
     // read length 
     p_message.length = spi_putc ( 0xff ) & 0x0f;     
     // data read 
-    for ( unsigned char i = 0 ; i <length; i ++ ) 
+    for ( unsigned char i = 0 ; i < p_message.length; i ++ ) 
     {         
     	p_message.data[i] = spi_putc ( 0xff ) ;
     }     
@@ -207,4 +221,3 @@ CanMessage can_get_message ( void )
     } 
     return(p_message);
 }
-*/
