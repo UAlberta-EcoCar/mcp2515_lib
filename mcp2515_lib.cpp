@@ -120,13 +120,6 @@ unsigned int mcp2515_init(void)
 	return(error);
 }
 
-void load_tx_buffer(char buffer_select)
-{
-	CAN_CS_LOW //select mcp2515
-	if(buffer_select == 0)
-	spi_putc(SPI_WRITE_TX | 0x00); //start at TXB0SIDH
-}
-
 unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 
 	//wait for TXB0CTRL.TXREQ bit to be clear
@@ -138,41 +131,24 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 	//set buffer to high priority (its the only buffer used)
 	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
 	
-	//set message id. for now only dealing with standard 11 bit id
-	//lower 3 bits of id go to bits 7-5 of register :( not nice
-	mcp2515_write_register(TXB0SIDL,(p_message -> id) << 5);
-	//bits 10-3 go to High register (a little nicer to do)
-	mcp2515_write_register(TXB0SIDH,(p_message -> id) >> 3);
 	
-    // ID If the message is a "Remote Transmit Request" 
-    if ( p_message -> RTransR ) 
-    { 
-    	// An RTR message does have a length but no data 
-    	// message length + RTR set         
-    	mcp2515_write_register ( TXB0DLC, ( 1 << RTR ) | p_message -> length ) ; 
-    } 
-    else 
-    { 
-    	// Set the message length         
-    	mcp2515_write_register ( TXB0DLC, p_message -> length ) ; 
-    	//write data 
-    	
-		
-		mcp2515_write_register(TXB0D0, p_message -> data[0]);
-		mcp2515_write_register(TXB0D1, p_message -> data[1]);
-		mcp2515_write_register(TXB0D2, p_message -> data[2]);
-		mcp2515_write_register(TXB0D3, p_message -> data[3]);
-		mcp2515_write_register(TXB0D4, p_message -> data[4]);
-		mcp2515_write_register(TXB0D5, p_message -> data[5]);
-		mcp2515_write_register(TXB0D6, p_message -> data[6]);
-		mcp2515_write_register(TXB0D7, p_message -> data[7]);
-    } 
-    // send CAN Message     
+	//load tx0 buffers
+	CAN_CS_LOW //select mcp2515
 	
-
-    CAN_CS_LOW     
-    spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01... makes no sense)
-    CAN_CS_HIGH
+	spi_putc(SPI_WRITE_TX | 0x00); //start at TXB0SIDH
+	
+	spi_putc(); //write to TXBnSIDH
+	spi_putc(); //write to TXBnSIDL
+	spi_putc(0x00); //write to  TXBnEID8
+	spi_putc(0x00); //write to TXBnEID0
+	spi_putc(); //write to TXBnDLC
+	spi_putc(); //write to TXBnDm //write data bytes
+	
+	
+        // send CAN Message  
+        CAN_CS_LOW     
+        spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01... makes no sense)
+        CAN_CS_HIGH
 	
 	delay(10);
 
