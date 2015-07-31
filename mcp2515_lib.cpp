@@ -151,10 +151,16 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
     	// Set the message length         
     	mcp2515_write_register ( TXB0DLC, p_message -> length ) ; 
     	//write data 
-    	for(char i = 0; i < p_message -> length; i++)
-		{
-			mcp2515_write_register(TXB0D0 + i, p_message -> data[i]);
-		}
+    	
+		
+		mcp2515_write_register(TXB0D0, p_message -> data[0]);
+		mcp2515_write_register(TXB0D1, p_message -> data[1]);
+		mcp2515_write_register(TXB0D2, p_message -> data[2]);
+		mcp2515_write_register(TXB0D3, p_message -> data[3]);
+		mcp2515_write_register(TXB0D4, p_message -> data[4]);
+		mcp2515_write_register(TXB0D5, p_message -> data[5]);
+		mcp2515_write_register(TXB0D6, p_message -> data[6]);
+		mcp2515_write_register(TXB0D7, p_message -> data[7]);
     } 
     // send CAN Message     
 	
@@ -191,8 +197,34 @@ CanMessage can_get_message ( void )
     unsigned char status = mcp2515_read_rx_status ( ) ;
     if ( bit_is_set ( status, 6 ) ) 
     { // message in buffer 0        
-	CAN_CS_LOW
-    spi_putc ( SPI_READ_RX ) ; 
+
+	 
+	// read standard ID     
+    p_message.id =  (unsigned int) mcp2515_read_register(RXB0SIDH) << 3 ;     
+    p_message.id |= (unsigned int) mcp2515_read_register(RXB0SIDL) >> 5 ;     
+    // read length 
+    p_message.length = mcp2515_read_register(RXB0DLC) & 0x0f;     
+    
+	
+	// data read 
+    p_message.data[0] = mcp2515_read_register(RXB0D0);
+    p_message.data[1] = mcp2515_read_register(RXB0D1);
+    p_message.data[2] = mcp2515_read_register(RXB0D2);
+    p_message.data[3] = mcp2515_read_register(RXB0D3);
+    p_message.data[4] = mcp2515_read_register(RXB0D4);
+    p_message.data[5] = mcp2515_read_register(RXB0D5);
+    p_message.data[6] = mcp2515_read_register(RXB0D6);
+    p_message.data[7] = mcp2515_read_register(RXB0D7);    
+	CAN_CS_HIGH 
+    if ( bit_is_set ( status, 3 ) ) 
+    {         
+    	p_message.RTransR = 1 ; 
+    	
+    } else 
+    {         
+    	p_message.RTransR = 0 ;
+    } 
+
     	
     } 
     else if ( bit_is_set ( status, 7 ) ) 
@@ -204,28 +236,6 @@ CanMessage can_get_message ( void )
     else 
     { // Error: No new message available 
 	return p_message;
-    } 
-    // read standard ID     
-    p_message.id =  (unsigned int) spi_putc( 0xff ) << 3 ;     
-    p_message.id |= (unsigned int) spi_putc( 0xff ) >> 5 ;     
-    spi_putc ( 0xff ) ;     
-    spi_putc ( 0xFF ) ; 
-    // read length 
-    p_message.length = spi_putc ( 0xff ) & 0x0f;     
-    // data read 
-    for ( unsigned char i = 0 ; i < p_message.length; i ++ ) 
-    {         
-    	p_message.data[i] = spi_putc ( 0xff ) ;
-    }     
-    CAN_CS_HIGH 
-    if ( bit_is_set ( status, 3 ) ) 
-    {         
-    	p_message.RTransR = 1 ; 
-    	
-    } else 
-    {         
-    	p_message.RTransR = 0 ;
-    	
     } 
     return(p_message);
 }
