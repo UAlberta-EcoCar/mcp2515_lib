@@ -3,6 +3,7 @@
 
 //to do: comments explaining each setting
 
+
 #define CNF1_Setting  (( 1 << BRP0 ) | ( 1 << BRP1 ) | ( 1 << BRP2 )) 
 //Should be 125 kbps
 
@@ -19,11 +20,9 @@
 #define RXB1CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 ))
 //same for buffer 1
  
-#define BFPCTRL_Setting ((1 << B0BFE)|(1 << B1BFE)|(1 << B0BFM)|(1 << B1BFM))
+#define BFPCTRL_Setting 0 //((1 << B0BFE)|(1 << B1BFE)|(1 << B0BFM)|(1 << B1BFM))
 //RXnBF pins set as interrupt for receive buffer full
 
 #define TXRTSCTRL_Setting 0
-
-
 
 #endif

@@ -64,7 +64,7 @@ unsigned int mcp2515_init(void)
 	
 	unsigned int error = 0;
 	
-	//write to all registers using settings defined above
+	//write to all registers using settings defined in other file
 	//also verify the settings
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
 	if (mcp2515_read_register(CNF1) != CNF1_Setting)
@@ -115,7 +115,9 @@ unsigned int mcp2515_init(void)
 	}
 	
 	
-	mcp2515_bit_modify ( CANCTRL, 0xE0, 0 ) ; //exit configure mode
+	//mcp2515_bit_modify ( CANCTRL, 0xE0, 0 ) ; //exit configure mode
+	
+	mcp2515_write_register(CANCTRL,(1 << 3)); //RETURN TO NORMAL MODE AND SET TO ONE SHOT MODE
 	
 	return(error);
 }
@@ -124,7 +126,11 @@ unsigned int mcp2515_init(void)
 
 unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 
-
+	//wait for TXB0CTRL.TXREQ bit to be clear
+	while(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
+	{
+		//do nothing
+	}
 	
 	//set buffer to high priority (its the only buffer used)
 	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
@@ -153,10 +159,14 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
     	} 
     } 
     // send CAN Message     
+	
+	//SPI_RTS doesn't seem to work
     CAN_CS_LOW     
-    spi_putc ( SPI_RTS | 0x00 ) ;  //request to send tx buffer 0   
+    spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01... makes no sense)
     CAN_CS_HIGH
+	
 	delay(10);
+
 	return (mcp2515_read_register(TXB0CTRL) & 0xF0); //should return 0x00
 }
 
@@ -172,7 +182,7 @@ unsigned char mcp2515_read_rx_status ( void )
     // So you need only one of the two bytes evaluated     
     spi_putc ( 0xff ) ; 
     CAN_CS_HIGH
-    return data; 
+    return data;
 }
 
 
