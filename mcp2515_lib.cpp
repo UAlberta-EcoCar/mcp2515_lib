@@ -114,10 +114,8 @@ unsigned int mcp2515_init(void)
 		error |= (1 << 7);
 	}
 	
-	
-	//mcp2515_bit_modify ( CANCTRL, 0xE0, 0 ) ; //exit configure mode
-	
-	mcp2515_write_register(CANCTRL,(1 << 3)); //RETURN TO NORMAL MODE AND SET TO ONE SHOT MODE
+		
+	mcp2515_write_register(CANCTRL,CANCTRL_Setting); //RETURN TO NORMAL MODE AND SET TO ONE SHOT MODE
 	
 	return(error);
 }
