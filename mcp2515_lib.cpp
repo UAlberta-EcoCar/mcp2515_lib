@@ -120,7 +120,12 @@ unsigned int mcp2515_init(void)
 	return(error);
 }
 
-
+void load_tx_buffer(char buffer_select)
+{
+	CAN_CS_LOW //select mcp2515
+	if(buffer_select == 0)
+	spi_putc(SPI_WRITE_TX | 0x00); //start at TXB0SIDH
+}
 
 unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 
@@ -164,7 +169,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
     } 
     // send CAN Message     
 	
-	//SPI_RTS doesn't seem to work
+
     CAN_CS_LOW     
     spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01... makes no sense)
     CAN_CS_HIGH
