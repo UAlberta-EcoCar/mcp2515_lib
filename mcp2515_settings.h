@@ -20,8 +20,8 @@
 #define RXB1CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 ))
 //same for buffer 1
  
-#define BFPCTRL_Setting 0 //((1 << B0BFE)|(1 << B1BFE)|(1 << B0BFM)|(1 << B1BFM))
-//RXnBF pins set as interrupt for receive buffer full
+#define BFPCTRL_Setting 0 ((1 << B0BFE)|(1 << B1BFE))
+//RXnBF pins set as standard ouputs
 
 #define TXRTSCTRL_Setting 0
 
