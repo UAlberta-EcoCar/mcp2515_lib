@@ -150,11 +150,11 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
     { 
     	// Set the message length         
     	mcp2515_write_register ( TXB0DLC, p_message -> length ) ; 
-    	// data 
-    	for ( unsigned char i = 1 ; i < p_message -> length; i ++ ) 
-    	{             
-    		mcp2515_write_register ( TXB0D0 + i, p_message -> data[i] ) ; 
-    	} 
+    	//write data 
+    	for(char i = 0; i < p_message -> length; i++)
+		{
+			mcp2515_write_register(TXB0D0 + i, p_message -> data[i]);
+		}
     } 
     // send CAN Message     
 	
@@ -213,7 +213,7 @@ CanMessage can_get_message ( void )
     // read length 
     p_message.length = spi_putc ( 0xff ) & 0x0f;     
     // data read 
-    for ( unsigned char i = 1 ; i < p_message.length; i ++ ) 
+    for ( unsigned char i = 0 ; i < p_message.length; i ++ ) 
     {         
     	p_message.data[i] = spi_putc ( 0xff ) ;
     }     

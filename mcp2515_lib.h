@@ -22,7 +22,7 @@ void mcp2515_write_register( unsigned char address, unsigned char data ) ;
 
 typedef struct 
 { 
-    unsigned int   id;
+    unsigned int   id = 0;
     unsigned char    RTransR = 0; //defaults to not a remote transmit request
     unsigned char    length;
     unsigned char    data [ 7 ] ;
