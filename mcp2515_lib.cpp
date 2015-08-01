@@ -120,8 +120,10 @@ unsigned int mcp2515_init(void)
 	return(error);
 }
 
-unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0 Other buffers shouldn't be neccessary
-{ 
+unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
+{ 	
+	//to do: utilise buffers 1 and 2 if buffer 0 is full
+	
 	//wait for TXB0CTRL.TXREQ bit to be clear
 	while(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
 	{
