@@ -120,10 +120,10 @@ unsigned int mcp2515_init(void)
 	return(error);
 }
 
-
-
 unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
-{ 
+{ 	
+	//to do: utilise buffers 1 and 2 if buffer 0 is full
+	
 	//wait for TXB0CTRL.TXREQ bit to be clear
 	while(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
 	{
@@ -133,35 +133,38 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 	//set buffer to high priority (its the only buffer used)
 	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
 	
-	//set message id. for now only dealing with standard 11 bit id
-	//lower 3 bits of id go to bits 7-5 of register :( not nice
-	mcp2515_write_register(TXB0SIDL,(p_message -> id) << 5);
-	//bits 10-3 go to High register (a little nicer to do)
-	mcp2515_write_register(TXB0SIDH,(p_message -> id) >> 3);
 	
-    // ID If the message is a "Remote Transmit Request" 
-    if ( p_message -> RTransR ) 
-    { 
-    	// An RTR message does have a length but no data 
-    	// message length + RTR set         
-    	mcp2515_write_register ( TXB0DLC, ( 1 << RTR ) | p_message -> length ) ; 
-    } 
-    else 
-    { 
-    	// Set the message length         
-    	mcp2515_write_register ( TXB0DLC, p_message -> length ) ; 
-    	//write data 
-    	for(char i = 0; i < p_message -> length; i++)
-		{
-			mcp2515_write_register(TXB0D0 + i, p_message -> data[i]);
-		}
-    } 
-    // send CAN Message     
+	//load tx0 buffers
+	CAN_CS_LOW //select mcp2515
 	
-	//SPI_RTS doesn't seem to work
-    CAN_CS_LOW     
-    spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01... makes no sense)
-    CAN_CS_HIGH
+	spi_putc(SPI_WRITE_TX | 0x00); //start at TXB0SIDH
+	
+	spi_putc(p_message -> id >> 3); //write to TXBnSIDH
+	spi_putc(p_message -> id << 5); //write to TXBnSIDL
+	spi_putc(0x00); //write to  TXBnEID8
+	spi_putc(0x00); //write to TXBnEID0
+	if (p_message -> RTransR) //if message is a remote transmit request
+	{
+		//write data length and RTR bit
+		spi_putc((1 << RTR) | p_message -> length); //write to TXBnDLC
+	}
+	else
+	{
+		//just write data length
+		spi_putc(p_message -> length);
+	}
+	//write data bytes
+	for (char i = 0; i < p_message -> length; i ++)
+	{
+		spi_putc(p_message -> data[i]); //write to TXBnDm
+	}
+	CAN_CS_HIGH //done loading tx 0 register
+	
+	
+        // send CAN Message  
+        CAN_CS_LOW
+        spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01)
+        CAN_CS_HIGH
 	
 	delay(10);
 
@@ -189,43 +192,48 @@ CanMessage can_get_message ( void )
     CanMessage p_message; //create a message
     // read status 
     unsigned char status = mcp2515_read_rx_status ( ) ;
+    
+    //start reading message
+    
+    
     if ( bit_is_set ( status, 6 ) ) 
-    { // message in buffer 0        
-	CAN_CS_LOW
-    spi_putc ( SPI_READ_RX ) ; 
-    	
+    { // message in buffer 0  
+    	CAN_CS_LOW  //select mcp2515
+	spi_putc(SPI_READ_RX | 0); //Start reading at RXB0SIDH
     } 
     else if ( bit_is_set ( status, 7 ) ) 
-    { // message in buffer 1         
-    CAN_CS_LOW         
-    spi_putc ( SPI_READ_RX | 0x04 ) ; 
-    	
+    { // message in buffer 1      
+    	CAN_CS_LOW  //select mcp2515
+	spi_putc(SPI_READ_RX | 2); //Start reading at RXB1SIDH
     } 
     else 
     { // Error: No new message available 
 	return p_message;
     } 
-    // read standard ID     
-    p_message.id =  (unsigned int) spi_putc( 0xff ) << 3 ;     
-    p_message.id |= (unsigned int) spi_putc( 0xff ) >> 5 ;     
-    spi_putc ( 0xff ) ;     
-    spi_putc ( 0xFF ) ; 
-    // read length 
-    p_message.length = spi_putc ( 0xff ) & 0x0f;     
-    // data read 
-    for ( unsigned char i = 0 ; i < p_message.length; i ++ ) 
-    {         
-    	p_message.data[i] = spi_putc ( 0xff ) ;
-    }     
-    CAN_CS_HIGH 
-    if ( bit_is_set ( status, 3 ) ) 
-    {         
-    	p_message.RTransR = 1 ; 
-    	
-    } else 
-    {         
-    	p_message.RTransR = 0 ;
-    	
-    } 
+    //read RXBnSIDH
+    p_message.length = spi_putc(0x00) << 3;
+    //read RXBnSIDL
+    p_message.length |= spi_putc(0x00) >> 5;
+    //read RXBnEID8
+    spi_putc(0x00);
+    //read RXBnEID0
+    spi_putc(0x00);
+    //read RXBnDLC
+    unsigned char RXBnDLC = spi_putc(0x00);
+    p_message.length = RXBnDLC & 0xff; //message length is last four bits
+    if (RXBnDLC & (1 << RTR)) //if message is a remote transmit request
+    {
+    	p_message.RTransR = 1; //message is a remote transmitt request
+    	//it won't have any data
+    }
+    else //message is not a remote transmit request
+    {
+    	//read data
+    	for(char i = 0; i < p_message.length; i++)
+    	{
+    		p_message.data[i] = spi_putc(0x00);
+    	}
+    }
+    CAN_CS_HIGH
     return(p_message);
 }

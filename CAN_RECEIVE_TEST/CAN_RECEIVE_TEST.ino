@@ -38,9 +38,9 @@ while(digitalRead(2) == 1)
   //wait for an message received interrupt
 }
 message = can_get_message();
-Serial.print("Message ID: ");
-Serial.println(message.id);
-Serial.print("Message Length: ");
+Serial.print("ID: ");
+Serial.println(message.id,HEX);
+Serial.print("Length: ");
 Serial.println(message.length);
 if (message.RTransR)
 {

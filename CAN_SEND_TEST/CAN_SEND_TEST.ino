@@ -42,7 +42,7 @@ void loop() {
 
 delay(2000);
 CanMessage message; //create new message
-message.id = 0xfe;
+message.id = 0xee;
 message.length = 8;
 message.RTransR = 0;
 message.data[0] = 3;
