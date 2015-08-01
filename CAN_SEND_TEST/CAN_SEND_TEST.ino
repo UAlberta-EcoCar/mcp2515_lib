@@ -8,7 +8,7 @@
 unsigned char var = 0;
 
 #define NL Serial.println();
-
+#define SPACE Serial.print(" ");
 
 void setup() {
   // put your setup code here, to run once:
@@ -18,7 +18,7 @@ void setup() {
   digitalWrite(A0,HIGH);
   
   spi_init();
-  var = mcp2515_init();
+  var = mcp2515_init(normal);
   if (var != 0)
   {
     Serial.println("mcp2515 config error");
@@ -30,31 +30,26 @@ void setup() {
       //hang up program
     }
   }
-  else
-  {
-
-  }
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
 
 delay(2000);
-CanMessage message; //create new message
-message.id = 0xee;
-message.length = 8;
-message.RTransR = 0;
-message.data[0] = 3;
-message.data[1] = 1;
-message.data[2] = 4;
-message.data[3] = 1;
-message.data[4] = 5;
-message.data[5] = 9;
-message.data[6] = 2;
-message.data[7] = 6;
+CanMessage message_send; //create new message
+message_send.id = 0x7;
+message_send.length = 8;
+message_send.RTransR = 0;
+message_send.data[0] = 3;
+message_send.data[1] = 1;
+message_send.data[2] = 4;
+message_send.data[3] = 1;
+message_send.data[4] = 5;
+message_send.data[5] = 9;
+message_send.data[6] = 2;
+message_send.data[7] = 6;
 
-var = can_send_message(&message);
+var = can_send_message(&message_send);
 if (var != 0)
 {
   Serial.print("transmition error: ");
@@ -65,9 +60,8 @@ else
   Serial.println("Message sent");
 }
 
+
 Serial.print("FreeRAM=");
 Serial.println(freeMemory());
 Serial.println();
-
-
 }

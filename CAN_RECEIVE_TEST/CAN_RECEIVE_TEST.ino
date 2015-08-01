@@ -15,7 +15,7 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   spi_init();
-  var = mcp2515_init();
+  var = mcp2515_init(normal);
   if (var != 0)
   {
     Serial.println("mcp2515 config error");
@@ -37,33 +37,28 @@ while(digitalRead(2) == 1)
 {
   //wait for an message received interrupt
 }
+
 message = can_get_message();
+
 Serial.print("ID: ");
 Serial.println(message.id,HEX);
+
 Serial.print("Length: ");
 Serial.println(message.length);
+
 if (message.RTransR)
 {
   Serial.println("Remote transmit request");
 }
+
 else
 {
   Serial.println("Data:");
-  Serial.print(message.data[0]);
-  SPACE
-  Serial.print(message.data[1]);
-  SPACE
-  Serial.print(message.data[2]);
-  SPACE
-  Serial.print(message.data[3]);
-  SPACE
-  Serial.print(message.data[4]);
-  SPACE
-  Serial.print(message.data[5]);
-  SPACE
-  Serial.print(message.data[6]);
-  SPACE
-  Serial.println(message.data[7]);
+  for(char i = 0; i < message.length; i++)
+  {
+    Serial.print(message.data[i],HEX);
+    SPACE
+  }
 }
 
 Serial.print("FreeRAM=");

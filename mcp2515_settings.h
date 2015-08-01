@@ -4,7 +4,7 @@
 //to do: comments explaining each setting
 
 
-#define CNF1_Setting  (( 1 << BRP0 )| (1 <<BRP1)) 
+#define CNF1_Setting  (( 1 << BRP0 )|(1 << BRP1)) 
 //Should be 250 kbps (will try faster later)
 
 #define CNF2_Setting (( 1 << BTLMODE ) | ( 1 << PHSEG11 ))
@@ -25,7 +25,6 @@
 
 #define TXRTSCTRL_Setting 0
 
-#define CANCTRL_Setting (1 << OSM)
-//Normal mode and One shot transmit mode
+#define CANCTRL_Setting 0
 
 #endif

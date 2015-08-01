@@ -12,7 +12,11 @@
 
 void mcp2515_bit_modify ( unsigned char address, unsigned char mask, unsigned char data );
 unsigned char mcp2515_read_register(unsigned char adress);
-unsigned int mcp2515_init(void);
+
+unsigned int mcp2515_init(char mode_select);
+#define loopback 1
+#define normal 0
+
 void mcp2515_write_register( unsigned char address, unsigned char data ) ;
 
 
@@ -24,8 +28,8 @@ typedef struct
 { 
     unsigned int   id = 0;
     unsigned char    RTransR = 0; //defaults to not a remote transmit request
-    unsigned char    length;
-    unsigned char    data [ 7 ] ;
+    unsigned char    length = 0;
+    unsigned char    data[7] ;
 } CanMessage; 
 
 unsigned char can_send_message ( CanMessage *p_message );

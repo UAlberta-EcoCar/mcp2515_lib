@@ -54,7 +54,7 @@ unsigned char mcp2515_read_register(unsigned char adress)
 
 
 
-unsigned int mcp2515_init(void)
+unsigned int mcp2515_init(char mode_select)
 {
 	DDR_CAN_CS |= (1 << P_CAN_CS); //set CS to output
 	CAN_CS_LOW
@@ -114,9 +114,16 @@ unsigned int mcp2515_init(void)
 		error |= (1 << 7);
 	}
 	
-		
-	mcp2515_write_register(CANCTRL,CANCTRL_Setting); //RETURN TO NORMAL MODE AND SET TO ONE SHOT MODE
-	
+	if (mode_select == loopback)
+	{
+		//enter loopback mode
+		mcp2515_write_register(CANCTRL,CANCTRL_Setting); 
+	}
+	else
+	{
+		//enter normal mode
+		mcp2515_write_register(CANCTRL,CANCTRL_Setting); //RETURN TO NORMAL MODE AND SET TO ONE SHOT MODE
+	}
 	return(error);
 }
 
@@ -143,6 +150,9 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 	spi_putc(p_message -> id << 5); //write to TXBnSIDL
 	spi_putc(0x00); //write to  TXBnEID8
 	spi_putc(0x00); //write to TXBnEID0
+	
+	
+	
 	if (p_message -> RTransR) //if message is a remote transmit request
 	{
 		//write data length and RTR bit
@@ -159,12 +169,12 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		spi_putc(p_message -> data[i]); //write to TXBnDm
 	}
 	CAN_CS_HIGH //done loading tx 0 register
-	
-	
-        // send CAN Message  
-        CAN_CS_LOW
-        spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01)
-        CAN_CS_HIGH
+	delay(10);
+		
+    // send CAN Message  
+    CAN_CS_LOW
+    spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01)
+    CAN_CS_HIGH
 	
 	delay(10);
 
@@ -194,26 +204,30 @@ CanMessage can_get_message ( void )
     unsigned char status = mcp2515_read_rx_status ( ) ;
     
     //start reading message
-    
+ 
     
     if ( bit_is_set ( status, 6 ) ) 
     { // message in buffer 0  
     	CAN_CS_LOW  //select mcp2515
-	spi_putc(SPI_READ_RX | 0); //Start reading at RXB0SIDH
-    } 
+		spi_putc(SPI_READ_RX | 0); //Start reading at RXB0SIDH
+	} 
     else if ( bit_is_set ( status, 7 ) ) 
     { // message in buffer 1      
     	CAN_CS_LOW  //select mcp2515
-	spi_putc(SPI_READ_RX | 2); //Start reading at RXB1SIDH
+		spi_putc(SPI_READ_RX | 2); //Start reading at RXB1SIDH
     } 
     else 
-    { // Error: No new message available 
-	return p_message;
+    { // Error: No new message available
+		return p_message;
     } 
+	
+	
+	p_message.data[6] = 0;
+	
     //read RXBnSIDH
-    p_message.length = spi_putc(0x00) << 3;
+    p_message.id = spi_putc(0x00) << 3;
     //read RXBnSIDL
-    p_message.length |= spi_putc(0x00) >> 5;
+    p_message.id |= spi_putc(0x00) >> 5;
     //read RXBnEID8
     spi_putc(0x00);
     //read RXBnEID0
@@ -235,5 +249,6 @@ CanMessage can_get_message ( void )
     	}
     }
     CAN_CS_HIGH
+	
     return(p_message);
 }
