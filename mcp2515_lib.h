@@ -29,7 +29,7 @@ typedef struct
     unsigned int   id = 0;
     unsigned char    RTransR = 0; //defaults to not a remote transmit request
     unsigned char    length = 0;
-    unsigned char    data[7] ;
+    unsigned char    data[8] ;
 } CanMessage; 
 
 unsigned char can_send_message ( CanMessage *p_message );

@@ -114,15 +114,17 @@ unsigned int mcp2515_init(char mode_select)
 		error |= (1 << 7);
 	}
 	
+	/*
 	if (mode_select == loopback)
 	{
 		//enter loopback mode
 		mcp2515_write_register(CANCTRL,CANCTRL_Setting); 
 	}
+	*/
 	else
 	{
 		//enter normal mode
-		mcp2515_write_register(CANCTRL,CANCTRL_Setting); //RETURN TO NORMAL MODE AND SET TO ONE SHOT MODE
+		mcp2515_write_register(CANCTRL,CANCTRL_Setting);
 	}
 	return(error);
 }
@@ -169,16 +171,13 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		spi_putc(p_message -> data[i]); //write to TXBnDm
 	}
 	CAN_CS_HIGH //done loading tx 0 register
-	delay(10);
 		
     // send CAN Message  
     CAN_CS_LOW
     spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01)
     CAN_CS_HIGH
-	
-	delay(10);
 
-	return (mcp2515_read_register(TXB0CTRL) & 0xF0); //should return 0x00
+	return (0); 
 }
 
 
@@ -218,6 +217,7 @@ CanMessage can_get_message ( void )
     } 
     else 
     { // Error: No new message available
+		p_message.id = 0;
 		return p_message;
     } 
 	
@@ -237,7 +237,7 @@ CanMessage can_get_message ( void )
     p_message.length = RXBnDLC & 0xff; //message length is last four bits
     if (RXBnDLC & (1 << RTR)) //if message is a remote transmit request
     {
-    	p_message.RTransR = 1; //message is a remote transmitt request
+    	p_message.RTransR = 1; //message is a remote transmit request
     	//it won't have any data
     }
     else //message is not a remote transmit request
@@ -249,6 +249,8 @@ CanMessage can_get_message ( void )
     	}
     }
     CAN_CS_HIGH
+	
+	
 	
     return(p_message);
 }
