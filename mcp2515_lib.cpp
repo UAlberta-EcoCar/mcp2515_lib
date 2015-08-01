@@ -120,7 +120,7 @@ unsigned int mcp2515_init(void)
 	return(error);
 }
 
-unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
+unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0 Other buffers shouldn't be neccessary
 { 
 	//wait for TXB0CTRL.TXREQ bit to be clear
 	while(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
@@ -232,6 +232,6 @@ CanMessage can_get_message ( void )
     		p_message.data[i] = spi_putc(0x00);
     	}
     }
-    
+    CAN_CS_HIGH
     return(p_message);
 }
