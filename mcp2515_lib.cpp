@@ -128,6 +128,16 @@ unsigned int mcp2515_init(char mode_select)
 		//enter normal mode
 		mcp2515_write_register(CANCTRL,CANCTRL_Setting);
 	}
+	
+	//set tx buffer 0 to high priority
+	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
+	
+	//set tx buffer 1 to high intermediate priority
+	mcp2515_write_register(TXB1CTRL, (1 << TXP1));
+	
+	//set tx buffer 2 to low intermediate priority
+	mcp2515_write_register(TXB1CTRL, (1 << TXP0));
+	
 	return(error);
 }
 
@@ -135,49 +145,68 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 { 	
 	//to do: utilise buffers 1 and 2 if buffer 0 is full
 	
-	//wait for TXB0CTRL.TXREQ bit to be clear
-	while(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
+	//check if tx buffer 0 is availible for message transmission
+	if(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
 	{
-		//do nothing
+		unsigned char send_command = SPI_RTS | 0x01; //RTS first buffer
+		CAN_CS_LOW //select mcp2515
+		//write to tx 0 buffers
+		spi_putc(SPI_WRITE_TX | 0x00); //starting at TXB0SIDH
+	}
+	//check tx buffer 1
+	else if (mcp2515_read_register(TXB1CTRL) & (1 << TXREQ))
+	{
+		unsigned char send_command = SPI_RTS | 0x02; //RTS second buffer
+		CAN_CS_LOW //select mcp2515
+		//write to tx 1 buffers
+		spi_putc(SPI_WRITE_TX | 0x02); //starting at TXB1SIDH
+	}
+	//check buffer 2
+	else if (mcp2515_read_register(TXB2CTRL) & (1 << TXREQ))
+	{
+		unsigned char send_command = SPI_RTS | 0x04; //RTS third buffer
+		CAN_CS_LOW //select mcp2515
+		//write to tx 2 buffers
+		spi_putc(SPI_WRITE_TX | 0x04); //starting at TXB2SIDH
+	}
+	else //no buffers open
+	{
+		//something is wrong or you are sending way to many messages
+		return(1);
 	}
 	
-	//set buffer to high priority (it's the only buffer used)
-	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
-	
-	
-	//load tx0 buffers
-	CAN_CS_LOW //select mcp2515
-	
-	spi_putc(SPI_WRITE_TX | 0x00); //start at TXB0SIDH
-	
+	//SPI_WRITE_TX command automatically moves to next address after write
+	//continue writing to other registers
 	spi_putc(p_message -> id >> 3); //write to TXBnSIDH
 	spi_putc(p_message -> id << 5); //write to TXBnSIDL
 	spi_putc(0x00); //write to  TXBnEID8
 	spi_putc(0x00); //write to TXBnEID0
 	
-	
-	
 	if (p_message -> RTransR) //if message is a remote transmit request
 	{
 		//write data length (should be zero?) and RTR bit
 		spi_putc((1 << RTR) | p_message -> length); //write to TXBnDLC
+		//RTR does not contain data
 	}
-	else
+	else //message is normal
 	{
 		//just write data length
 		spi_putc(p_message -> length);
-	}
-	//write data bytes
-	for (char i = 0; i < p_message -> length; i ++)
-	{
-		spi_putc(p_message -> data[i]); //write to TXBnDm
-	}
-	CAN_CS_HIGH //done loading tx 0 buffer
 		
-    // send CAN Message  
-    CAN_CS_LOW
-    spi_putc ( SPI_RTS | 0x01 ) ;  //Request To Send tx buffer 0. (1st buffer therefore write 0x01)
-    CAN_CS_HIGH
+		//regular message contains data
+		
+		//write data bytes
+		for (char i = 0; i < p_message -> length; i ++)
+		{
+		spi_putc(p_message -> data[i]); //write to TXBnDm
+		}
+	}
+	
+	CAN_CS_HIGH //done loading tx 0 buffer
+	// send CAN Message  
+	CAN_CS_LOW
+	spi_putc ( send_command );  
+	CAN_CS_HIGH
 
 	return (0); 
 }
