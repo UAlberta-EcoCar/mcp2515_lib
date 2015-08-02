@@ -12,6 +12,16 @@
 //sck is pin 5
 #define P_SCK 5
 
+//SC is on port B
+#define DDR_CS DDRB
+#define PORT_CS PORTB
+//pin 2
+#define P_CS 2
+
+//define macros for turning CS line on and off with less typing
+#define CS_HIGH PORT_CS |= (1 << P_CS);
+#define CS_LOW PORT_CS &= (1 << P_CS);
+
 //sets up spi bus
 void spi_init(void);
 
