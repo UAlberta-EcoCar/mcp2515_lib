@@ -24,34 +24,34 @@ void mcp2515_write_register( unsigned char address, unsigned char data )
 
 void mcp2515_bit_modify ( unsigned char address, unsigned char mask, unsigned char data ) 
 { 
-    //select mcp2515
-    CAN_CS_LOW
+    	//select mcp2515
+    	CAN_CS_LOW
 	//send bit modify command
-    spi_putc ( SPI_BIT_MODIFY ) ;
+	spi_putc ( SPI_BIT_MODIFY ) ;
 	//send register address
-    spi_putc ( address ) ;
+    	spi_putc ( address ) ;
 	//send modify bit mask
-    spi_putc ( mask ) ;
+	 spi_putc ( mask ) ;
 	//send new bit values
-    spi_putc ( data ) ; 
+    	spi_putc ( data ) ; 
 	//deselect mcp2515
-    CAN_CS_HIGH 
+    	CAN_CS_HIGH 
 }
 
 unsigned char mcp2515_read_register(unsigned char adress)
 {
-    unsigned char data;
+	unsigned char data;
 	//select mcp2515
-    CAN_CS_LOW
-    //send read command
-    spi_putc(SPI_READ);
+    	CAN_CS_LOW
+    	//send read command
+    	spi_putc(SPI_READ);
 	//send address you want to read
-    spi_putc(adress);
+    	spi_putc(adress);
 	//send dummy byte to read value
-    data = spi_putc(0xff); 
+    	data = spi_putc(0xff); 
 	//deselect mcp2515
-    CAN_CS_HIGH
-    return data;
+    	CAN_CS_HIGH
+    	return data;
 }
 
 
@@ -136,15 +136,13 @@ unsigned int mcp2515_init(char mode_select)
 	mcp2515_write_register(TXB1CTRL, (1 << TXP1));
 	
 	//set tx buffer 2 to low intermediate priority
-	mcp2515_write_register(TXB1CTRL, (1 << TXP0));
+	mcp2515_write_register(TXB2CTRL, (1 << TXP0));
 	
 	return(error);
 }
 
 unsigned char can_send_message ( CanMessage *p_message ) //sends message using tx buffer 0
 { 	
-	//to do: utilise buffers 1 and 2 if buffer 0 is full
-	
 	//check if tx buffer 0 is availible for message transmission
 	if(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
 	{
@@ -202,8 +200,9 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		}
 	}
 	
-	CAN_CS_HIGH //done loading tx 0 buffer
-	// send CAN Message  
+	CAN_CS_HIGH //done loading tx buffer
+	
+	// tell mcp2515 to send message  
 	CAN_CS_LOW
 	spi_putc ( send_command );  
 	CAN_CS_HIGH
@@ -214,68 +213,70 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 
 unsigned char mcp2515_read_rx_status ( void ) 
 { 
-    unsigned char data; 
-    // CS of the MCP2515 on low drag     
-    CAN_CS_LOW     
-    spi_putc ( SPI_RX_STATUS ) ;     
-    data = spi_putc ( 0xFF ) ; 
-    // The data is sent again repeated
-    // So you need only one of the two bytes evaluated     
-    spi_putc ( 0xff ) ; 
-    CAN_CS_HIGH
-    return data;
+    	//select mcp2515
+    	CAN_CS_LOW
+    	//send read rx status command
+    	spi_putc ( SPI_RX_STATUS ) ; 
+    	//read status
+    	unsigned char data = spi_putc ( 0xFF ) ; 
+    	// The data is sent again repeated
+    	// So you need only one of the two bytes evaluated     
+    	//therefore might as well comment out this line
+    	//spi_putc ( 0xff ) ; 
+    	CAN_CS_HIGH
+    	return data;
 }
 
 
 CanMessage can_get_message ( void ) 
 { 
-    CanMessage p_message; //create a message
+    	CanMessage p_message; //create a message
     
 	//start reading message
 	
 	// read status 
-    unsigned char status = mcp2515_read_rx_status ( ) ;
+    	unsigned char status = mcp2515_read_rx_status ( ) ;
      
-    if ( bit_is_set ( status, 6 ) ) 
-    { // message in buffer 0  
+	if ( bit_is_set ( status, 6 ) ) 
+	{ // message in buffer 0  
     	CAN_CS_LOW  //select mcp2515
 		spi_putc(SPI_READ_RX | 0); //Start reading at RXB0SIDH
 	} 
-    else if ( bit_is_set ( status, 7 ) ) 
-    { // message in buffer 1      
-    	CAN_CS_LOW  //select mcp2515
+    	else if ( bit_is_set ( status, 7 ) ) 
+    	{ // message in buffer 1      
+    		CAN_CS_LOW  //select mcp2515
 		spi_putc(SPI_READ_RX | 2); //Start reading at RXB1SIDH
-    } 
-    else 
-    { // Error: No new message available
+    	} 
+    	else 
+    	{ // Error: No new message available
 		return p_message;
-    } 
+    	} 
 	
-    //read RXBnSIDH
-    p_message.id = spi_putc(0x00) << 3;
-    //read RXBnSIDL
-    p_message.id |= spi_putc(0x00) >> 5;
-    //read RXBnEID8
-    spi_putc(0x00);
-    //read RXBnEID0
-    spi_putc(0x00);
-    //read RXBnDLC
-    unsigned char RXBnDLC = spi_putc(0x00);
-    p_message.length = RXBnDLC & 0xff; //message length is last four bits
-    if (RXBnDLC & (1 << RTR)) //if message is a remote transmit request
-    {
-    	p_message.RTransR = 1; //message is a remote transmit request
-    	//it won't have any data
-    }
-    else //message is not a remote transmit request
-    {
-    	//read data
-    	for(char i = 0; i < p_message.length; i++)
+    	//read RXBnSIDH
+    	p_message.id = spi_putc(0x00) << 3;
+    	//read RXBnSIDL
+    	p_message.id |= spi_putc(0x00) >> 5;
+    	//read RXBnEID8
+    	spi_putc(0x00);
+    	//read RXBnEID0
+    	spi_putc(0x00);
+    	//read RXBnDLC
+    	unsigned char RXBnDLC = spi_putc(0x00);
+    	p_message.length = RXBnDLC & 0xff; //message length is last four bits
+    	if (RXBnDLC & (1 << RTR)) //if message is a remote transmit request
     	{
-    		p_message.data[i] = spi_putc(0x00);
+    		p_message.RTransR = 1; //message is a remote transmit request
+    		//it won't have any data
     	}
-    }
-    CAN_CS_HIGH //deselect mcp2515
+    	else //message is not a remote transmit request
+    	{
+    		//read data
+    		for(char i = 0; i < p_message.length; i++)
+    		{
+    			p_message.data[i] = spi_putc(0x00);
+    		}
+    	}
+    	CAN_CS_HIGH //deselect mcp2515
 	
-    return(p_message);
+    	return(p_message);
 }
