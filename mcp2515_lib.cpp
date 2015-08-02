@@ -10,7 +10,7 @@
 
 void mcp2515_write_register( unsigned char address, unsigned char data ) 
 { 
-    //  CS of the MCP2515 on low drag
+    //select the mcp2515
     CAN_CS_LOW
     //tell chip you're going to write
     spi_putc ( SPI_WRITE ) ;
@@ -18,37 +18,39 @@ void mcp2515_write_register( unsigned char address, unsigned char data )
     spi_putc ( address ) ;    
     //send value
     spi_putc ( data ) ; 
-    // CS line unlock     
+    //deselect mcp2515  
     CAN_CS_HIGH 
 }
 
 void mcp2515_bit_modify ( unsigned char address, unsigned char mask, unsigned char data ) 
 { 
-    // / CS of the MCP2515 on low drag
+    //select mcp2515
     CAN_CS_LOW
+	//send bit modify command
     spi_putc ( SPI_BIT_MODIFY ) ;
+	//send register address
     spi_putc ( address ) ;
+	//send modify bit mask
     spi_putc ( mask ) ;
+	//send new bit values
     spi_putc ( data ) ; 
-	// re-enable CS line
+	//deselect mcp2515
     CAN_CS_HIGH 
 }
 
 unsigned char mcp2515_read_register(unsigned char adress)
 {
     unsigned char data;
-   
-    // /CS des MCP2515 auf Low ziehen
+	//select mcp2515
     CAN_CS_LOW
-   
+    //send read command
     spi_putc(SPI_READ);
+	//send address you want to read
     spi_putc(adress);
-   
+	//send dummy byte to read value
     data = spi_putc(0xff); 
-   
-    // /CS Leitung wieder freigeben
+	//deselect mcp2515
     CAN_CS_HIGH
-   
     return data;
 }
 
@@ -56,16 +58,16 @@ unsigned char mcp2515_read_register(unsigned char adress)
 
 unsigned int mcp2515_init(char mode_select)
 {
-	DDR_CAN_CS |= (1 << P_CAN_CS); //set CS to output
-	CAN_CS_LOW
-	spi_putc(SPI_RESET);
+	DDR_CAN_CS |= (1 << P_CAN_CS); //set CAN_CS pin to output
+	CAN_CS_LOW //select mcp2515
+	spi_putc(SPI_RESET); //send reset command
 	_delay_ms(10); //wait for chip to reset
-	CAN_CS_HIGH
+	CAN_CS_HIGH //deselect chip
 	
 	unsigned int error = 0;
 	
-	//write to all registers using settings defined in other file
-	//also verify the settings
+	//write to all registers using settings defined mcp2515_settins.h
+	//also verify the settings so that you know the chip is connected
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
 	if (mcp2515_read_register(CNF1) != CNF1_Setting)
 	{
@@ -103,13 +105,13 @@ unsigned int mcp2515_init(char mode_select)
 	}
 	
 	mcp2515_write_register ( BFPCTRL, BFPCTRL_Setting ) ;
-	if ((mcp2515_read_register(BFPCTRL) & 0x0F) != BFPCTRL_Setting)
+	if ((mcp2515_read_register(BFPCTRL) & 0x0F) != BFPCTRL_Setting) //read back the only writeable bits
 	{
 		error |= (1 << 6);
 	}
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
-	if ((mcp2515_read_register(TXRTSCTRL) & 0x07) != TXRTSCTRL_Setting)
+	if ((mcp2515_read_register(TXRTSCTRL) & 0x07) != TXRTSCTRL_Setting) //read back only the writeable bits
 	{
 		error |= (1 << 7);
 	}
@@ -121,7 +123,7 @@ unsigned int mcp2515_init(char mode_select)
 		mcp2515_write_register(CANCTRL,CANCTRL_Setting); 
 	}
 	*/
-	else
+	else if (mode_select == normal)
 	{
 		//enter normal mode
 		mcp2515_write_register(CANCTRL,CANCTRL_Setting);
@@ -139,7 +141,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		//do nothing
 	}
 	
-	//set buffer to high priority (its the only buffer used)
+	//set buffer to high priority (it's the only buffer used)
 	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
 	
 	
@@ -157,7 +159,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 	
 	if (p_message -> RTransR) //if message is a remote transmit request
 	{
-		//write data length and RTR bit
+		//write data length (should be zero?) and RTR bit
 		spi_putc((1 << RTR) | p_message -> length); //write to TXBnDLC
 	}
 	else
@@ -170,11 +172,11 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 	{
 		spi_putc(p_message -> data[i]); //write to TXBnDm
 	}
-	CAN_CS_HIGH //done loading tx 0 register
+	CAN_CS_HIGH //done loading tx 0 buffer
 		
     // send CAN Message  
     CAN_CS_LOW
-    spi_putc ( SPI_RTS | 0x01 ) ;  //request to send tx buffer 0 (1st buffer therefore write 0x01)
+    spi_putc ( SPI_RTS | 0x01 ) ;  //Request To Send tx buffer 0. (1st buffer therefore write 0x01)
     CAN_CS_HIGH
 
 	return (0); 
@@ -188,7 +190,7 @@ unsigned char mcp2515_read_rx_status ( void )
     CAN_CS_LOW     
     spi_putc ( SPI_RX_STATUS ) ;     
     data = spi_putc ( 0xFF ) ; 
-    // The data is sent again repeated , . 
+    // The data is sent again repeated
     // So you need only one of the two bytes evaluated     
     spi_putc ( 0xff ) ; 
     CAN_CS_HIGH
@@ -199,12 +201,12 @@ unsigned char mcp2515_read_rx_status ( void )
 CanMessage can_get_message ( void ) 
 { 
     CanMessage p_message; //create a message
-    // read status 
+    
+	//start reading message
+	
+	// read status 
     unsigned char status = mcp2515_read_rx_status ( ) ;
-    
-    //start reading message
- 
-    
+     
     if ( bit_is_set ( status, 6 ) ) 
     { // message in buffer 0  
     	CAN_CS_LOW  //select mcp2515
@@ -217,12 +219,8 @@ CanMessage can_get_message ( void )
     } 
     else 
     { // Error: No new message available
-		p_message.id = 0;
 		return p_message;
     } 
-	
-	
-	p_message.data[6] = 0;
 	
     //read RXBnSIDH
     p_message.id = spi_putc(0x00) << 3;
@@ -248,9 +246,7 @@ CanMessage can_get_message ( void )
     		p_message.data[i] = spi_putc(0x00);
     	}
     }
-    CAN_CS_HIGH
-	
-	
+    CAN_CS_HIGH //deselect mcp2515
 	
     return(p_message);
 }

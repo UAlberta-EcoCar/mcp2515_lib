@@ -37,41 +37,6 @@
 #define TXRTSCTRL	0x0D
 #define CANSTAT		0x0E
 #define CANCTRL		0x0F
-
-#define RXF3SIDH	0x10
-#define RXF3SIDL	0x11
-#define RXF3EID8	0x12
-#define RXF3EID0	0x13
-#define RXF4SIDH	0x14
-#define RXF4SIDL	0x15
-#define RXF4EID8	0x16
-#define RXF4EID0	0x17
-#define RXF5SIDH	0x18
-#define RXF5SIDL	0x19
-#define RXF5EID8	0x1A
-#define RXF5EID0	0x1B
-#define TEC			0x1C
-#define REC         0x1D
-
-#define RXM0SIDH	0x20
-#define RXM0SIDL	0x21
-#define RXM0EID8	0x22
-#define RXM0EID0	0x23
-#define RXM1SIDH	0x24
-#define RXM1SIDL	0x25
-#define RXM1EID8	0x26
-#define RXM1EID0	0x27
-#define CNF3		0x28
-#define CNF2		0x29
-#define CNF1		0x2A
-#define CANINTE		0x2B
-#define CANINTF		0x2C
-#define EFLG		0x2D
-
-#define TXB0CTRL	0x30
-#define TXB0SIDH	0x31
-#define TXB0SIDL	0x32
-#define TXB0EID8	0x33
 #define TXB0EID0	0x34
 #define TXB0DLC		0x35
 #define TXB0D0		0x36
@@ -80,7 +45,43 @@
 #define TXB0D3		0x39
 #define TXB0D4		0x3A
 #define TXB0D5		0x3B
-#define TXB0D6		0x3C
+#define TXB0D6		0x3CIndex of file:///C:/Program Files (x86)/Firefox Developer Edition/
+
+Up to higher level directory
+Name 	Size 	Last Modified
+File:AccessibleMarshal.dll
+	21 KB 	2015-07-27 	11:23:48 AM
+File:D3DCompiler_43.dll
+	2057 KB 	2015-07-26 	8:14:16 PM
+File:application.ini
+	1 KB 	2015-07-27 	11:23:48 AM
+File:breakpadinjector.dll
+	108 KB 	2015-07-27 	11:23:48 AM
+browser
+		2015-07-27 	11:23:48 AM
+File:crashreporter.exe
+	277 KB 	2015-07-27 	11:23:48 AM
+File:crashreporter.ini
+	4 KB 	2015-07-26 	8:14:13 PM
+File:d3dcompiler_47.dll
+	3386 KB 	2015-07-26 	8:14:13 PM
+defaults
+		2015-07-27 	11:23:39 AM
+File:dependentlibs.list
+	1 KB 	2015-07-26 	8:14:13 PM
+dictionaries
+		2015-07-27 	11:23:39 AM
+File:firefox.exe
+	406 KB 	2015-07-27 	11:23:48 AM
+File:freebl3.chk
+	1 KB 	2015-07-27 	11:23:47 AM
+File:freebl3.dll
+	324 KB 	2015-07-27 	11:23:47 AM
+gmp-clearkey
+		2015-07-27 	11:23:39 AM
+File:icudt52.dll
+	10154 KB 	2015-07-27 	11:23:47 AM
+File:icuin52.dll
 #define TXB0D7		0x3D
 
 #define TXB1CTRL	0x40
