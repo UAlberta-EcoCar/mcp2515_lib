@@ -1,14 +1,30 @@
 #ifndef mcp2515_settings_H
 #define mcp2515_settings_H
 
-//to do: comments explaining each setting
+#ifndef CAN_BAUDRATE
+#define CAN_BAUDRATE 250K //default baudrate 250k
+#endif
 
-//see http://www.kvaser.com/support/calculators/bit-timing-calculator/ for calculating these values
+//see http://www.kvaser.com/support/calculators/bit-timing-calculator/ for calculating baudrate.
 //im not sure how they work exactly
-#define CNF1_Setting  0xc0
-#define CNF2_Setting  0x91
-#define CNF3_Setting  0x03
-//this should be 500kHz with a 10 MHz crystal
+
+#if CAN_BAUDRATE==125K
+#define CNF1_Setting  
+#define CNF2_Setting  
+#define CNF3_Setting  
+#endif
+
+#if CAN_BAUDRATE==250K
+#define CNF1_Setting  
+#define CNF2_Setting  
+#define CNF3_Setting  
+#endif
+
+#if CAN_BAUDRATE==500K
+#define CNF1_Setting  
+#define CNF2_Setting  
+#define CNF3_Setting  
+#endif
 
 
 #define CANINTE_Setting (( 1 << RX1IE ) | ( 1 << RX0IE ))
