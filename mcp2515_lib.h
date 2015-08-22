@@ -22,9 +22,14 @@ unsigned char mcp2515_read_register(unsigned char adress);
 
 //sets up the mcp2515
 //requires spi to already be started (spi_init())
-unsigned int mcp2515_init(char mode_select);
-//mcp2515_init() can set the chip to different modes defined here
-#define normal 0
+unsigned int mcp2515_init(void);
+
+//mcp2515 can run in different modes
+//default is normal mode
+#ifndef CAN_MODE
+#define CAN_MODE NORMAL_MODE
+#endif
+
 
 //writes to a register
 void mcp2515_write_register( unsigned char address, unsigned char data ) ;
