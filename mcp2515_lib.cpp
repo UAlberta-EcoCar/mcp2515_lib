@@ -56,7 +56,7 @@ unsigned char mcp2515_read_register(unsigned char adress)
 
 
 
-unsigned int mcp2515_init(char mode_select)
+unsigned int mcp2515_init(void)
 {
 	DDR_CAN_CS |= (1 << P_CAN_CS); //set CAN_CS pin to output
 	CAN_CS_LOW //select mcp2515
@@ -96,20 +96,9 @@ unsigned int mcp2515_init(char mode_select)
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
 	
-	
-	/*
-	if (mode_select == loopback)
-	{
-		//enter loopback mode
-		mcp2515_write_register(CANCTRL,CANCTRL_Setting); 
-	}
-	*/
-	else if (mode_select == NORMAL)
-	{
-		//enter normal mode
-		mcp2515_write_register(CANCTRL,CANCTRL_Setting);
-	}
-	
+	//set canctrl to specified mode
+	mcp2515_write_register(CANCTRL,CAN_MODE);
+
 	//set tx buffer 0 to high priority
 	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
 	
