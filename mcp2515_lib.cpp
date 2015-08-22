@@ -67,7 +67,7 @@ unsigned int mcp2515_init(char mode_select)
 	unsigned int error = 0;
 	
 	//write to all registers using settings defined mcp2515_settins.h
-	//also verify the settings so that you know the chip is connected
+	//also verify a few settings so that you know the chip is connected
 	mcp2515_write_register ( CNF1 , CNF1_Setting);
 	if (mcp2515_read_register(CNF1) != CNF1_Setting)
 	{
@@ -87,34 +87,15 @@ unsigned int mcp2515_init(char mode_select)
 	}
 	
 	mcp2515_write_register ( CANINTE, CANINTE_Setting);
-	if (mcp2515_read_register(CANINTE) != CANINTE_Setting)
-	{
-		error |= (1 << 3);
-	}
-	
+
 	mcp2515_write_register ( RXB0CTRL, RXB0CTRL_Setting );
-	if(mcp2515_read_register(RXB0CTRL) != RXB0CTRL_Setting)
-	{
-		error |= (1 << 4);
-	}
 	
 	mcp2515_write_register ( RXB1CTRL, RXB1CTRL_Setting );
-	if(mcp2515_read_register(RXB1CTRL) != RXB1CTRL_Setting )
-	{
-		error |= (1 << 5);
-	}
 	
 	mcp2515_write_register ( BFPCTRL, BFPCTRL_Setting ) ;
-	if ((mcp2515_read_register(BFPCTRL) & 0x0F) != BFPCTRL_Setting) //read back the only writeable bits
-	{
-		error |= (1 << 6);
-	}
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
-	if ((mcp2515_read_register(TXRTSCTRL) & 0x07) != TXRTSCTRL_Setting) //read back only the writeable bits
-	{
-		error |= (1 << 7);
-	}
+	
 	
 	/*
 	if (mode_select == loopback)
@@ -123,7 +104,7 @@ unsigned int mcp2515_init(char mode_select)
 		mcp2515_write_register(CANCTRL,CANCTRL_Setting); 
 	}
 	*/
-	else if (mode_select == normal)
+	else if (mode_select == NORMAL)
 	{
 		//enter normal mode
 		mcp2515_write_register(CANCTRL,CANCTRL_Setting);
