@@ -12,16 +12,12 @@ unsigned char var = 0;
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
-
-  pinMode(A0,OUTPUT);
-  digitalWrite(A0,HIGH);
   
   spi_init();
   var = mcp2515_init(normal);
   if (var != 0)
   {
-    Serial.println("mcp2515 config error");
-    Serial.print("error:");
+    Serial.print("mcp2515 config error: ");
     Serial.println(var,BIN);
     NL
     while(1)
