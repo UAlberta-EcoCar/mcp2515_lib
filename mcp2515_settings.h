@@ -51,7 +51,13 @@
 #define TXRTSCTRL_Setting 0
 //TXnRTS pins set as general inputs
 
-#define CANCTRL_Setting 0
+// CANCTRL reg sets chip to different modes:
 //normal mode
+#define NORMAL_MODE 0
+//loop back mode
+#define LOOPBACK_MODE 2
+//listen only mode
+#define LISTENONLY_MODE 3
+
 
 #endif
