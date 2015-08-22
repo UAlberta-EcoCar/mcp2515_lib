@@ -27,6 +27,7 @@
 #define TXRTSCTRL_Setting 0
 //TXnRTS pins set as general inputs
 
+#ifndef CANMODE
 #define CANCTRL_Setting 0
 //normal mode
 
