@@ -24,12 +24,6 @@ unsigned char mcp2515_read_register(unsigned char adress);
 //requires spi to already be started (spi_init())
 unsigned int mcp2515_init(void);
 
-//mcp2515 can run in different modes
-//default is normal mode
-#ifndef CAN_MODE
-#define CAN_MODE NORMAL_MODE
-#endif
-
 
 //writes to a register
 void mcp2515_write_register( unsigned char address, unsigned char data ) ;
@@ -42,10 +36,10 @@ void mcp2515_write_register( unsigned char address, unsigned char data ) ;
 //structure for building can messages to send to can_send_message()
 typedef struct 
 { 
-    unsigned int   id = 0;
+    unsigned int     id = 0;
     unsigned char    RTransR = 0; //defaults to not a remote transmit request
     unsigned char    length = 0;
-    unsigned char    data[8] = [0,0,0,0,0,0,0,0];
+unsigned char    data[8] = {0,0,0,0,0,0,0,0};
 } CanMessage; 
 
 //sends can message

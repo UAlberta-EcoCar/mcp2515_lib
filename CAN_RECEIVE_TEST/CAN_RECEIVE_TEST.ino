@@ -1,4 +1,4 @@
-//this sketch receives data over can
+//this sketch receives data over CAN
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
 #include <spi_lib.h>
@@ -14,24 +14,23 @@ void setup()
 {
   Serial.begin(115200);
   spi_init();
-  var = mcp2515_init(normal);
-  if (var != 0)
+  
+  if (mcp2515_init())
   {
     Serial.println("mcp2515 config error");
-    Serial.print("error:");
-    Serial.println(var);
     NL
+    while(1)
+    {
+      //hang up program
+    }
   }
-  else
-  {
-
-  }
+  //else: everything is good
   pinMode(2,INPUT); //mcp2515 interrupt pin
 }
 
 void loop() 
 {
-  //make new message
+  //make new empty message
   CanMessage message;
   while(digitalRead(2) == 1)
   {

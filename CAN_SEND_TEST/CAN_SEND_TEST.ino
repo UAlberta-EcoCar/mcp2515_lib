@@ -1,4 +1,4 @@
-//This examples sends the first 8 digits of pi over can.
+//This example sends the first 8 digits of pi over can.
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
 #include <spi_lib.h>
@@ -14,17 +14,17 @@ void setup() {
   Serial.begin(115200);
   
   spi_init();
-  var = mcp2515_init(normal);
-  if (var != 0)
+  
+  if (mcp2515_init())
   {
     Serial.print("mcp2515 config error: ");
-    Serial.println(var,BIN);
     NL
     while(1)
     {
       //hang up program
     }
   }
+  //else everything is good (hopefully)
 }
 
 void loop() 
@@ -38,7 +38,7 @@ void loop()
   message_send.id = 0x7;
   //set message length
   message_send.length = 8;
-  //set whether message is a remote transmit request
+  //set whether message is a remote transmit request (it's not)
   message_send.RTransR = 0;
   //set 8 data bytes
   message_send.data[0] = 3;
@@ -50,11 +50,10 @@ void loop()
   message_send.data[6] = 2;
   message_send.data[7] = 6;
   
-  var = can_send_message(&message_send);
-  if (var != 0)
+  if (can_send_message(&message_send))
   {
-    Serial.print("transmition error: ");
-    Serial.println(var,BIN); 
+    Serial.print("Transmition Error: ");
+    //something is wrong and/or all transmition buffers are full.
   }
   else
   {
