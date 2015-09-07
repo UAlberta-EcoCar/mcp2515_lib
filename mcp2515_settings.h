@@ -1,8 +1,10 @@
 #ifndef mcp2515_settings_H
 #define mcp2515_settings_H
 
+//baudrate defaults to 250000
+//or you can set it to one of the values below
 #ifndef CAN_BAUDRATE
-#define CAN_BAUDRATE 250000 //default baudrate 250k
+#define CAN_BAUDRATE 250000
 #endif
 
 //see http://www.kvaser.com/support/calculators/bit-timing-calculator/ for calculating bitrate.
@@ -51,7 +53,7 @@
 #define TXRTSCTRL_Setting 0
 //TXnRTS pins set as general inputs
 
-// CANCTRL reg sets chip to different modes:
+//CANCTRL sets different modes:
 //normal mode
 #define NORMAL_MODE 0
 //loop back mode
@@ -59,5 +61,11 @@
 //listen only mode
 #define LISTENONLY_MODE 3
 
+//default to normal mode
+#ifndef CANMODE
+#define CANCTRL_Setting NORMAL_MODE
+//Or you can define a different mode
+#else CANCTRL_Setting CANMODE
+#endif
 
 #endif
