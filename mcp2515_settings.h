@@ -7,8 +7,8 @@
 #define CAN_BAUDRATE 250000
 #endif
 
-//see http://www.kvaser.com/support/calculators/bit-timing-calculator/ for calculating bitrate.
-//I'm not sure how they work exactly
+//I haven't double checked these values with the datasheet so they are probably way off
+//double checked 250kbps setting (it wasn't close) now fixed (i hope)
 
 //the following assume 16MHz clock. 
 #if CAN_BAUDRATE==125000
@@ -18,9 +18,12 @@
 #endif
 
 #if CAN_BAUDRATE==250000
-#define CNF1_Setting  0x41
-#define CNF2_Setting  0xF1
-#define CNF3_Setting  0x85
+#define CNF1_Setting ((1 << BRP1)|(1<<BRP0))  //BPR = 3
+#define CNF2_Setting  ((1<<BTLMODE)|(1<<PHSEG11)) //PS1 = (2+1)TQ //PropSeg = (0+1)TQ
+#define CNF3_Setting  (1<<PHSEG21) //PS2 = (2+1)TQ
+//TQ = 0.5(10)^-6
+//NBT = 1(TQ) + 1(TQ) + 3(TQ) + 3(TQ) = 4(10)^-6
+//1/NBT = 250000
 #endif
 
 #if CAN_BAUDRATE==500000

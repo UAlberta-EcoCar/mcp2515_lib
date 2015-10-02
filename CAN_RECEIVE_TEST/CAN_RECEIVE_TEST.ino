@@ -1,7 +1,7 @@
 //this sketch receives data over CAN
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
-#include <spi_lib.h>
+
 
 
 unsigned char var = 0;
@@ -13,9 +13,9 @@ unsigned char var = 0;
 void setup() 
 {
   Serial.begin(115200);
-  spi_init();
+
   
-  if (mcp2515_init())
+  if (can_init())
   {
     Serial.println("mcp2515 config error");
     NL

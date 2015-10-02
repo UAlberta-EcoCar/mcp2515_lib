@@ -56,8 +56,9 @@ unsigned char mcp2515_read_register(unsigned char adress)
 
 
 
-unsigned int mcp2515_init(void)
+unsigned int can_init(void)
 {
+	spi_init();
 	DDR_CAN_CS |= (1 << P_CAN_CS); //set CAN_CS pin to output
 	CAN_CS_LOW //select mcp2515
 	spi_putc(SPI_RESET); //send reset command

@@ -1,7 +1,7 @@
 //This example sends the first 8 digits of pi over can.
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
-#include <spi_lib.h>
+
 
 
 unsigned char var = 0;
@@ -13,9 +13,9 @@ void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
   
-  spi_init();
+
   
-  if (mcp2515_init())
+  if (can_init())
   {
     Serial.print("mcp2515 config error: ");
     NL
