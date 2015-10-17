@@ -4,7 +4,7 @@ Based off code found at http://www.kreatives-chaos.com/artikel/ansteuerung-eines
 
 :car: :blue_car: :car: :blue_car: :car: :blue_car: :car: :blue_car: :car: :blue_car: :car: :blue_car: 
 
-#How to install:
+##How to install:
 * Arduino IDE: copy to libraries folder to install
 * Atmel Studio: I don't know. Copy files to project folder?
 * Anything else: Copy files to project folder
