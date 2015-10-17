@@ -5,6 +5,9 @@ Based off code found at http://www.kreatives-chaos.com/artikel/ansteuerung-eines
 MCP2515 Data Sheet: http://ww1.microchip.com/downloads/en/DeviceDoc/21801e.pdf
 
 How to install:
+
 Arduino IDE: copy to libraries folder to install
+
 Atmel Studio: IDK. copy files to project folder?
+
 Anything else: Copy files to project folder
