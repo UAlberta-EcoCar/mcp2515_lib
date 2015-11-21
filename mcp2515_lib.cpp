@@ -116,7 +116,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 { 	
 	unsigned char send_command;
 	//check if tx buffer 0 is availible for message transmission
-	if(mcp2515_read_register(TXB0CTRL) & (1 << TXREQ))
+	if((mcp2515_read_register(TXB0CTRL) & (1 << TXREQ)) == 0)
 	{
 		send_command = SPI_RTS | 0x01; //RTS first buffer
 		CAN_CS_LOW //select mcp2515
@@ -124,7 +124,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		spi_putc(SPI_WRITE_TX | 0x00); //starting at TXB0SIDH
 	}
 	//check tx buffer 1
-	else if (mcp2515_read_register(TXB1CTRL) & (1 << TXREQ))
+	else if ((mcp2515_read_register(TXB1CTRL) & (1 << TXREQ))==0)
 	{
 		send_command = SPI_RTS | 0x02; //RTS second buffer
 		CAN_CS_LOW //select mcp2515
@@ -132,7 +132,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		spi_putc(SPI_WRITE_TX | 0x02); //starting at TXB1SIDH
 	}
 	//check buffer 2
-	else if (mcp2515_read_register(TXB2CTRL) & (1 << TXREQ))
+	else if ((mcp2515_read_register(TXB2CTRL) & (1 << TXREQ))==0)
 	{
 		send_command = SPI_RTS | 0x04; //RTS third buffer
 		CAN_CS_LOW //select mcp2515
