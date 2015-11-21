@@ -219,7 +219,8 @@ CanMessage can_get_message ( void )
     unsigned char status = mcp2515_read_rx_status ( ) ;
      
 	if ( bit_is_set ( status, 6 )  )
-	{ // message in buffer 0      	CAN_CS_LOW  //select mcp2515
+	{ // message in buffer 0      	
+		CAN_CS_LOW  //select mcp2515
 		spi_putc(SPI_READ_RX | 0); //Start reading at RXB0SIDH
 	} 
     else if ( bit_is_set ( status, 7 ) ) 
