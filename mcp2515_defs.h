@@ -192,9 +192,9 @@
 #define PHSEG12		5
 #define PHSEG11		4
 #define PHSEG10		3
-#define PHSEG2		2
-#define PHSEG1		1
-#define PHSEG0		0
+#define PRSEG2		2
+#define PRSEG1		1
+#define PRSEG0		0
 
 /** \brief	Bitdefinition von CNF1 */
 #define SJW1		7

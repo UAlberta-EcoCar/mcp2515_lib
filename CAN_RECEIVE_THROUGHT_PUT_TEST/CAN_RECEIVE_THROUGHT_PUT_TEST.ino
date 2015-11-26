@@ -27,37 +27,29 @@ void setup()
   //else: everything is good
   pinMode(9,INPUT); //mcp2515 interrupt pin
 }
-
+unsigned long time1 = 0;
+unsigned long message_count = 0; 
 void loop() 
 {
   //make new empty message
   CanMessage message;
-  while(digitalRead(9) == 1)
+  message.id = 0;
+  if(millis()-time1 > 1000)
+  {
+    Serial.print("Messages recieved: ");
+    Serial.println(message_count);
+    message_count = 0;
+    time1 = millis();
+  }
+  
+  if(digitalRead(9) == 0)
   {
     //wait for an message received interrupt
-  }
-  //receive message
-  message = can_get_message();
-
-  Serial.print("ID: ");
-  Serial.println(message.id,HEX);
-
-  Serial.print("Length: ");
-  Serial.println(message.length);
-
-  if (message.RTransR)
-  {
-    Serial.println("Remote transmit request");
-  }
-  else
-  {
-    Serial.println("Data:");
-    for(char i = 0; i < message.length; i++)
+    //receive message
+    message = can_get_message();
+    if(message.id == 0x7)
     {
-      Serial.print(message.data[i],HEX);
-      SPACE
+      message_count ++;
     }
   }
-NL
-NL
 }

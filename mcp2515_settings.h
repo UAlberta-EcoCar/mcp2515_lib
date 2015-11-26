@@ -12,31 +12,31 @@
 
 //the following assume 16MHz clock. 
 #if CAN_BAUDRATE==125000
-#define CNF1_Setting  0x03
-#define CNF2_Setting  0xF0
-#define CNF3_Setting  0x86
+#define CNF1_Setting  (3 << BRP0)
+#define CNF2_Setting  ((1<<BTLMODE)|(6<<PHSEG10)|(1 << PRSEG0)) //PS1 = (6+1)TQ //PropSeg = (1+1)TQ
+#define CNF3_Setting  (5<<PHSEG20) //PS2 = (5+1)TQ
+//TQ = 0.5(10)^-7
+//NBT = 1(TQ) + 2(TQ) + 7(TQ) + 6(TQ) = 4(10)^-6
+//1/NBT = 125000
 #endif
 
 #if CAN_BAUDRATE==250000
-#define CNF1_Setting ((1 << BRP1)|(1<<BRP0))  //BPR = 3
-#define CNF2_Setting  ((1<<BTLMODE)|(1<<PHSEG11)) //PS1 = (2+1)TQ //PropSeg = (0+1)TQ
-#define CNF3_Setting  (1<<PHSEG21) //PS2 = (2+1)TQ
-//TQ = 0.5(10)^-6
-//NBT = 1(TQ) + 1(TQ) + 3(TQ) + 3(TQ) = 4(10)^-6
+#define CNF1_Setting (1 << BRP0)  //BPR = 1+1
+#define CNF2_Setting  ((1<<BTLMODE)|(6<<PHSEG10)|(1 << PRSEG0)) //PS1 = (6+1)TQ //PropSeg = (1+1)TQ
+#define CNF3_Setting  (5<<PHSEG20) //PS2 = (5+1)TQ
+//TQ = 0.25(10)^-7
+//NBT = 1(TQ) + 2(TQ) + 7(TQ) + 6(TQ) = 4(10)^-6
 //1/NBT = 250000
 #endif
 
+//doesn't work
 #if CAN_BAUDRATE==500000
 #define CNF1_Setting  0
-#define CNF2_Setting  0xF0
-#define CNF3_Setting  0x86
-#endif
-
-
-#if CAN_BAUDRATE==1000000
-#define CNF1_Setting  0
-#define CNF2_Setting  0xD0
-#define CNF3_Setting  0x82
+#define CNF2_Setting  ((1<<BTLMODE)|(6<<PHSEG10)|(1 << PRSEG0)) //PS1 = (6+1)TQ //PropSeg = (1+1)TQ
+#define CNF3_Setting  (5<<PHSEG20) //PS2 = (5+1)TQ
+//TQ = 0.125(10)^-7
+//NBT = 1(TQ) + 2(TQ) + 7(TQ) + 6(TQ) = 4(10)^-6
+//1/NBT = 5000000
 #endif
 
 

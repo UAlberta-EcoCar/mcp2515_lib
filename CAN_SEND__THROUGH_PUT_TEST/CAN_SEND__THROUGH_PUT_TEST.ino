@@ -26,12 +26,10 @@ void setup() {
   }
   //else everything is good (hopefully)
 }
-
+unsigned int message_count = 0;
+unsigned long time1 = 0;
 void loop() 
 {
-
-  delay(2000);
-
   //creat new message
   CanMessage message_send;
   //set message id
@@ -52,15 +50,21 @@ void loop()
   
   if (can_send_message(&message_send))
   {
-    Serial.print("Transmition Error: ");
+    //Serial.println("Transmition Error: ");
     //something is wrong and/or all transmition buffers are full.
-    NL
   }
   else
   {
-    Serial.println("Message sent");
+    //Serial.println("Message sent");
+    message_count ++;
   }
-
-  NL
-
+  if(millis()-time1 > 1000)
+  {
+    Serial.print("Messages sent: ");
+    Serial.println(message_count);
+    message_count = 0;
+    
+    delay(1000);
+    time1 = millis();
+  } 
 }
