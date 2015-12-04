@@ -1,7 +1,8 @@
+
 //this sketch receives data over CAN
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
-
+#include <can_message_defs.h>
 
 
 unsigned char var = 0;
@@ -38,25 +39,12 @@ void loop()
   }
   //receive message
   message = can_get_message();
-
-  Serial.print("ID: ");
-  Serial.println(message.id,HEX);
-
-  Serial.print("Length: ");
-  Serial.println(message.length);
-
-  if (message.RTransR)
+  if(message.id == MESSAGE_FC_FCTEMP_ID)
   {
-    Serial.println("Remote transmit request");
-  }
-  else
-  {
-    Serial.println("Data:");
-    for(char i = 0; i < message.length; i++)
-    {
-      Serial.print(message.data.u8[i],HEX);
-      SPACE
-    }
+    Serial.print("FCTEMP ");
+    Serial.print(message.MESSAGE_DATA_FCTEMP1);
+    Serial.print("  ");
+    Serial.println(message.MESSAGE_DATA_FCTEMP2);
   }
 NL
 NL

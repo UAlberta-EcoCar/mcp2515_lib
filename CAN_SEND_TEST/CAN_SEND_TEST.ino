@@ -1,7 +1,7 @@
 //This example sends the first 8 digits of pi over can.
 #include <mcp2515_lib.h>
 #include <mcp2515_settings.h>
-
+#include <can_message_defs.h>
 
 
 unsigned char var = 0;
@@ -35,20 +35,16 @@ void loop()
   //creat new message
   CanMessage message_send;
   //set message id
-  message_send.id = 0x7;
+  //for example use id for Fuel cell temperature
+  message_send.id = MESSAGE_FC_ID_FCTEMP;
   //set message length
-  message_send.length = 8;
+  message_send.length = MESSAGE_FC_LENGTH_FCTEMP;
   //set whether message is a remote transmit request (it's not)
   message_send.RTransR = 0;
   //set 8 data bytes
-  message_send.data.u8[0] = 3;
-  message_send.data.u8[1] = 1;
-  message_send.data.u8[2] = 4;
-  message_send.data.u8[3] = 1;
-  message_send.data.u8[4] = 5;
-  message_send.data.u8[5] = 9;
-  message_send.data.u8[6] = 2;
-  message_send.data.u8[7] = 6;
+  //fuel cell controller has two different temperature readings
+  message_send.MESSAGE_FC_DATA_FCTEMP1 = 4000; //32bit unsigned int
+  message_send.MESSAGE_FC_DATA_FCTEMP2 = 3999;
   
   if (can_send_message(&message_send))
   {
@@ -62,5 +58,4 @@ void loop()
   }
 
   NL
-
 }
