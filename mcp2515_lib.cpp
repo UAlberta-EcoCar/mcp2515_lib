@@ -168,7 +168,7 @@ unsigned char can_send_message ( CanMessage *p_message ) //sends message using t
 		//write data bytes
 		for (char i = 0; i < p_message -> length; i ++)
 		{
-		spi_putc(p_message -> data[i]); //write to TXBnDm
+		spi_putc(p_message -> data.u8[i]); //write to TXBnDm
 		}
 	}
 	
@@ -254,7 +254,7 @@ CanMessage can_get_message ( void )
     	//read data
     	for(char i = 0; i < p_message.length; i++)
     	{
-    		p_message.data[i] = spi_putc(0x00);
+    		p_message.data.u8[i] = spi_putc(0x00);
     	}
     }
     CAN_CS_HIGH //deselect mcp2515

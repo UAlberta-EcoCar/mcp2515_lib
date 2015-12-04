@@ -54,7 +54,7 @@ void loop()
     Serial.println("Data:");
     for(char i = 0; i < message.length; i++)
     {
-      Serial.print(message.data[i],HEX);
+      Serial.print(message.data.u8[i],HEX);
       SPACE
     }
   }

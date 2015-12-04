@@ -39,14 +39,14 @@ void loop()
   //set whether message is a remote transmit request (it's not)
   message_send.RTransR = 0;
   //set 8 data bytes
-  message_send.data[0] = 3;
-  message_send.data[1] = 1;
-  message_send.data[2] = 4;
-  message_send.data[3] = 1;
-  message_send.data[4] = 5;
-  message_send.data[5] = 9;
-  message_send.data[6] = 2;
-  message_send.data[7] = 6;
+  message_send.data.u8[0] = 3;
+  message_send.data.u8[1] = 1;
+  message_send.data.u8[2] = 4;
+  message_send.data.u8[3] = 1;
+  message_send.data.u8[4] = 5;
+  message_send.data.u8[5] = 9;
+  message_send.data.u8[6] = 2;
+  message_send.data.u8[7] = 6;
   
   if (can_send_message(&message_send))
   {
