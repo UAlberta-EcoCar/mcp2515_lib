@@ -43,12 +43,19 @@
 #define CANINTE_Setting (( 1 << RX1IE ) | ( 1 << RX0IE ))
 //interrupt when either receive buffer is full
 
-#define RXB0CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 )|(1 << BUKT))
+//#define RXB0CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 )|(1 << BUKT))
 //all receive masks/filters disabled buffer 0
 //message will rollover to buffer 1 if buffer 0 is full
 
-#define RXB1CTRL_Setting (( 1 << RXM1 ) | ( 1 << RXM0 ))
+//#define RXB1CTRL_Setting (( 1 << RXM0 )|(1 << RXM1))
 //all receive mask/filters disabled for buffer 1
+
+#define RXB0CTRL_Setting (1 << BUKT)
+//turn on filters/masks for standard and extended IDs for Buffer 0
+//message will rollover to buffer 1 if buffer 0 is full
+
+#define RXB1CTRL_Setting 0
+//turn on filters/masks for standard and extended IDs for Buffer 1
  
 #define BFPCTRL_Setting ((1 << B0BFE)|(1 << B1BFE))
 //RXnBF pins set as standard ouputs

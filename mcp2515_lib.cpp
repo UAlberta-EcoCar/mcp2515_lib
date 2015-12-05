@@ -1,3 +1,4 @@
+#include "can_message_defs.h"
 #include "mcp2515_lib.h"
 #include "spi_lib.h"
 #include "mcp2515_defs.h"
@@ -96,9 +97,25 @@ unsigned int can_init(void)
 	mcp2515_write_register ( BFPCTRL, BFPCTRL_Setting ) ;
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
+
+	//create filter RXF0 for buffer rx 0
+	mcp2515_write_register ( RXF0SIDH, (FILTER0 >> 3) );
+	mcp2515_write_register ( RXF0SIDL, (FILTER0 << 5) ) ;
+
+	//create mask for buffer 0 (consider all)
+	mcp2515_write_register (RXM0SIDH, MASK0);
+	mcp2515_write_register (RXM0SIDL, (MASK0 << 5) );
+
+	//create filter RXF2 for buffer rx 1
+	mcp2515_write_register ( RXF1SIDH, (FILTER2 >> 3) );
+	mcp2515_write_register ( RXF1SIDL, (FILTER2 << 5) ) ;
+
+	//create mask for buffer 1 (consider all)
+	mcp2515_write_register (RXM1SIDH, MASK1);
+	mcp2515_write_register (RXM1SIDL, (MASK1 << 5) );
 	
 	//set canctrl to specified mode
-	mcp2515_write_register(CANCTRL,CANCTRL_Setting);
+	mcp2515_write_register(CANCTRL, CANCTRL_Setting);
 
 	//set tx buffer 0 to high priority
 	mcp2515_write_register(TXB0CTRL, (1 << TXP0) | (1 << TXP1));
@@ -230,7 +247,7 @@ CanMessage can_get_message ( void )
     } 
     else 
     { // Error: No new message available
-		return p_message;
+		return p_message; // Reserve ID = 0 for no message received
     } 
 	
     //read RXBnSIDH
@@ -243,6 +260,8 @@ CanMessage can_get_message ( void )
     spi_putc(0x00);
     //read RXBnDLC
     unsigned char RXBnDLC = spi_putc(0x00);
+
+    // Should be & ox0F since we only want last byte?
     p_message.length = RXBnDLC & 0xff; //message length is last four bits
     if (RXBnDLC & (1 << RTR)) //if message is a remote transmit request
     {
@@ -257,6 +276,11 @@ CanMessage can_get_message ( void )
     		p_message.data[i] = spi_putc(0x00);
     	}
     }
+
+    // Delete from here when working
+    
+    // Delete to here
+
     CAN_CS_HIGH //deselect mcp2515
    	return(p_message);
 }
