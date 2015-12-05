@@ -20,6 +20,9 @@ void mcp2515_bit_modify ( unsigned char address, unsigned char mask, unsigned ch
 //ex "int val = mcp2515_read_register(CANINTF);" reads interrupt flags
 unsigned char mcp2515_read_register(unsigned char adress);
 
+// Reads the rx status register
+unsigned char mcp2515_read_rx_status ( void ); 
+
 //sets up the mcp2515
 //requires spi to already be started (spi_init())
 unsigned int can_init(void);

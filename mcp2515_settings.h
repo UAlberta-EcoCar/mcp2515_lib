@@ -50,9 +50,9 @@
 //#define RXB1CTRL_Setting (( 1 << RXM0 )|(1 << RXM1))
 //all receive mask/filters disabled for buffer 1
 
-#define RXB0CTRL_Setting (1 << BUKT)
+#define RXB0CTRL_Setting 0
 //turn on filters/masks for standard and extended IDs for Buffer 0
-//message will rollover to buffer 1 if buffer 0 is full
+
 
 #define RXB1CTRL_Setting 0
 //turn on filters/masks for standard and extended IDs for Buffer 1

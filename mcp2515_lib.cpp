@@ -3,6 +3,7 @@
 #include "spi_lib.h"
 #include "mcp2515_defs.h"
 #include "mcp2515_settings.h"
+#include "mcp2515_filter_settings.h"
 #include <arduino.h>
 #include <avr/io.h>
 #include <avr/delay.h>
@@ -98,21 +99,42 @@ unsigned int can_init(void)
 	
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
 
+
+
+	//create mask for buffer 0 (consider all)
+	mcp2515_write_register (RXM0SIDH, (MASK0 >> 3) );
+	mcp2515_write_register (RXM0SIDL, (MASK0 << 5) );
+
 	//create filter RXF0 for buffer rx 0
 	mcp2515_write_register ( RXF0SIDH, (FILTER0 >> 3) );
 	mcp2515_write_register ( RXF0SIDL, (FILTER0 << 5) ) ;
 
-	//create mask for buffer 0 (consider all)
-	mcp2515_write_register (RXM0SIDH, MASK0);
-	mcp2515_write_register (RXM0SIDL, (MASK0 << 5) );
+	//create filter RXF1 for buffer rx 0
+	mcp2515_write_register ( RXF1SIDH, (FILTER1 >> 3) );
+	mcp2515_write_register ( RXF1SIDL, (FILTER1 << 5) ) ;
 
-	//create filter RXF2 for buffer rx 1
-	mcp2515_write_register ( RXF1SIDH, (FILTER2 >> 3) );
-	mcp2515_write_register ( RXF1SIDL, (FILTER2 << 5) ) ;
+
 
 	//create mask for buffer 1 (consider all)
-	mcp2515_write_register (RXM1SIDH, MASK1);
+	mcp2515_write_register (RXM1SIDH, (MASK1 >> 3) );
 	mcp2515_write_register (RXM1SIDL, (MASK1 << 5) );
+
+	//create filter RXF2 for buffer rx 1
+	mcp2515_write_register ( RXF2SIDH, (FILTER2 >> 3) );
+	mcp2515_write_register ( RXF2SIDL, (FILTER2 << 5) ) ;
+
+	//create filter RXF2 for buffer rx 1
+	mcp2515_write_register ( RXF3SIDH, (FILTER3 >> 3) );
+	mcp2515_write_register ( RXF3SIDL, (FILTER3 << 5) ) ;
+
+	//create filter RXF2 for buffer rx 1
+	mcp2515_write_register ( RXF4SIDH, (FILTER4 >> 3) );
+	mcp2515_write_register ( RXF4SIDL, (FILTER4 << 5) ) ;
+
+	//create filter RXF2 for buffer rx 1
+	mcp2515_write_register ( RXF5SIDH, (FILTER5 >> 3) );
+	mcp2515_write_register ( RXF5SIDL, (FILTER5 << 5) ) ;
+	
 	
 	//set canctrl to specified mode
 	mcp2515_write_register(CANCTRL, CANCTRL_Setting);
