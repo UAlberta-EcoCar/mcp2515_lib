@@ -101,7 +101,7 @@ unsigned int can_init(void)
 
 
 
-	//create mask for buffer 0 (consider all)
+	//create mask for buffer 0 
 	mcp2515_write_register (RXM0SIDH, (MASK0 >> 3) );
 	mcp2515_write_register (RXM0SIDL, (MASK0 << 5) );
 
@@ -115,7 +115,7 @@ unsigned int can_init(void)
 
 
 
-	//create mask for buffer 1 (consider all)
+	//create mask for buffer 1 
 	mcp2515_write_register (RXM1SIDH, (MASK1 >> 3) );
 	mcp2515_write_register (RXM1SIDL, (MASK1 << 5) );
 
@@ -123,15 +123,15 @@ unsigned int can_init(void)
 	mcp2515_write_register ( RXF2SIDH, (FILTER2 >> 3) );
 	mcp2515_write_register ( RXF2SIDL, (FILTER2 << 5) ) ;
 
-	//create filter RXF2 for buffer rx 1
+	//create filter RXF3 for buffer rx 1
 	mcp2515_write_register ( RXF3SIDH, (FILTER3 >> 3) );
 	mcp2515_write_register ( RXF3SIDL, (FILTER3 << 5) ) ;
 
-	//create filter RXF2 for buffer rx 1
+	//create filter RXF4 for buffer rx 1
 	mcp2515_write_register ( RXF4SIDH, (FILTER4 >> 3) );
 	mcp2515_write_register ( RXF4SIDL, (FILTER4 << 5) ) ;
 
-	//create filter RXF2 for buffer rx 1
+	//create filter RXF5 for buffer rx 1
 	mcp2515_write_register ( RXF5SIDH, (FILTER5 >> 3) );
 	mcp2515_write_register ( RXF5SIDL, (FILTER5 << 5) ) ;
 	
