@@ -53,8 +53,8 @@
 
 #if NODE_ID==LISTEN_ALL
 
-#define MASK0 0x7ff
-#define MASK1 0x7ff
+#define MASK0 0x000
+#define MASK1 0x000
 
 #define FILTER0 0x7ff
 #define FILTER1 0x7ff

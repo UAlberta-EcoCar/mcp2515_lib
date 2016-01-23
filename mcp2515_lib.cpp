@@ -237,17 +237,22 @@ unsigned char mcp2515_read_rx_status ( void )
     return data;
 }
 
+// Gives several debugging register values
+unsigned char mcp2515_read_status ( void ) 
+{     //select mcp2515
+    CAN_CS_LOW
+    //send read status command
+    spi_putc ( SPI_READ_STATUS ) ; 
+    //read status
+    unsigned char data = spi_putc ( 0xFF ) ; 
+
+    CAN_CS_HIGH
+    return data;
+}
+
+
 
 //get message from mcp2515
-//issues: 
-	//what if there are two messages?
-	//does interrupt stay on?
-	//solution: read status a second time, return value and let user program decide
-				// issue: not as nice
-				// extra 3 spi commands?
-			//or rebuild function to return two messages
-				// issue: function becomes x2 larger. x2 ram usage
-	//more testing required
 CanMessage can_get_message ( void ) 
 { 
     CanMessage p_message; //create a message
