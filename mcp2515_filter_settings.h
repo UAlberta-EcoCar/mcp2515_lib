@@ -10,11 +10,10 @@
 #define NODE_2 2
 #define FILTER_FUEL_CELL_CONTROLLER 3
 #define FILTER_MOTOR_CONTROLLER 4
-#define LISTEN_ALL 5
 
 // Choose the Node Being Used
 #ifndef NODE_ID
-#define NODE_ID LISTEN_ALL
+#define NODE_ID NODE_2
 #endif
 
 // MASKS:
@@ -50,19 +49,4 @@
 #define FILTER5 0
 
 #endif
-
-#if NODE_ID==LISTEN_ALL
-
-#define MASK0 0x7ff
-#define MASK1 0x7ff
-
-#define FILTER0 0x7ff
-#define FILTER1 0x7ff
-#define FILTER2 0
-#define FILTER3 0
-#define FILTER4 0
-#define FILTER5 0
-
-#endif
-
 #endif

@@ -1,6 +1,8 @@
 #ifndef mcp2515_settings_H
 #define mcp2515_settings_H
 
+
+
 //baudrate defaults to 250000
 //or you can set it to one of the values below
 #ifndef CAN_BAUDRATE
@@ -50,8 +52,10 @@
 //#define RXB1CTRL_Setting (( 1 << RXM0 )|(1 << RXM1))
 //all receive mask/filters disabled for buffer 1
 
-#define RXB0CTRL_Setting 0
+#define RXB0CTRL_Setting (1 << BUKT)
 //turn on filters/masks for standard and extended IDs for Buffer 0
+//turn on Rollover mode. Messages that fit filters for Buffer0 will
+//go to buffer1 if buffer0 is full
 
 
 #define RXB1CTRL_Setting 0
