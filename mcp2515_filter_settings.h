@@ -56,8 +56,8 @@
 #define MASK0 0x000
 #define MASK1 0x000
 
-#define FILTER0 0x7ff
-#define FILTER1 0x7ff
+#define FILTER0 0
+#define FILTER1 0
 #define FILTER2 0
 #define FILTER3 0
 #define FILTER4 0
