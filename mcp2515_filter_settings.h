@@ -3,7 +3,7 @@
 
 
 
-#include "can_message_defs.h"
+//#include "can_message_defs.h"
 
 // List of Node IDs
 #define NODE_1 1
@@ -36,6 +36,7 @@
 
 #endif
 
+
 #if NODE_ID==NODE_2
 
 // do not consider data type bits
@@ -50,6 +51,7 @@
 #define FILTER5 0
 
 #endif
+
 
 #if NODE_ID==LISTEN_ALL
 
