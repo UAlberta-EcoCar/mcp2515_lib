@@ -4,7 +4,7 @@
 //baudrate defaults to 250000
 //or you can set it to one of the values below
 #ifndef CAN_BAUDRATE
-#define CAN_BAUDRATE 250000
+#define CAN_BAUDRATE 500000
 #endif
 
 //I haven't double checked these values with the datasheet so they are probably way off

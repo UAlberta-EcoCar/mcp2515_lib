@@ -72,7 +72,7 @@ void loop()
       datastring += String(ID_tmp);  // add ID to string
       datastring += " ";
       datastring += String(length_tmp); // add length to string
-      for (int i = 0; i < length_tmp / 2; i++){ // Add data to string
+      for (int i = 0; i < length_tmp / 4; i++){ // Add data to string
         datastring += " ";
         datastring += String(message_receive_0.data.u32[i]);
       }
@@ -88,7 +88,7 @@ void loop()
       datastring += String(ID_tmp);  // add ID to string
       datastring += " ";
       datastring += String(length_tmp); // add length to string
-      for (int i = 0; i < length_tmp / 2; i++){ // Add data to string
+      for (int i = 0; i < 2; i++){ // Add data to string
         datastring += " ";
         datastring += String(message_receive_1.data.u32[i]);
       }
