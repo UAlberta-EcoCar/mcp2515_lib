@@ -37,26 +37,13 @@ void mcp2515_write_register( unsigned char address, unsigned char data ) ;
 #define RXnBF_pins_off mcp2515_write_register(BFPCTRL,BFPCTRL_Setting);
 
 
-//data type for canbus data
-// 64-bit union
-typedef union
-{
-  long 			s32[2];
-  unsigned long u32[2];
-  int 			s16[4];
-  unsigned int  u16[4];
-  char 			s8 [8];
-  unsigned char u8 [8];
-} Union64;
-
-
 //structure for building can messages to send to can_send_message()
 typedef struct 
 { 
     unsigned int     id = 0;
     unsigned char    RTransR = 0; //defaults to not a remote transmit request
     unsigned char    length = 0;
-	Union64          data;
+	unsigned char    data [8] = {0,0,0,0,0,0,0,0};
 } CanMessage; 
 
 
