@@ -2,7 +2,7 @@
 #include "spi_lib.h"
 #include "mcp2515_defs.h"
 #include "mcp2515_settings.h"
-#include "mcp2515_filter_settings.h"
+#include "mcp2515_filters.h"
 #include <arduino.h>
 #include <avr/io.h>
 #include <avr/delay.h>
@@ -57,7 +57,7 @@ unsigned char mcp2515_read_register(unsigned char adress)
 
 
 
-unsigned int can_init(void)
+unsigned int can_init(uint16_t MASK0, uint16_t FILTER0, uint16_t FILTER1, uint16_t MASK1, uint16_t FILTER2, uint16_t FILTER3, uint16_t FILTER4, uint16_t FILTER5)
 {
 	spi_init();
 	DDR_CAN_CS |= (1 << P_CAN_CS); //set CAN_CS pin to output
@@ -99,7 +99,7 @@ unsigned int can_init(void)
 	mcp2515_write_register ( TXRTSCTRL, TXRTSCTRL_Setting ) ;
 
 
-
+	
 	//create mask for buffer 0 
 	mcp2515_write_register (RXM0SIDH, (MASK0 >> 3) );
 	mcp2515_write_register (RXM0SIDL, (MASK0 << 5) );

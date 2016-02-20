@@ -1,5 +1,8 @@
+
 #ifndef MCP2515_LIB_H
 #define MCP2515_LIB_H
+
+#include <arduino.h>
 
 //CAN CS pin on port B
 #define DDR_CAN_CS DDRB
@@ -24,8 +27,8 @@ unsigned char mcp2515_read_register(unsigned char adress);
 unsigned char mcp2515_read_rx_status ( void ); 
 
 //sets up the mcp2515
-//requires spi to already be started (spi_init())
-unsigned int can_init(void);
+// also configures spi
+unsigned int can_init(uint16_t MASK0, uint16_t FILTER0, uint16_t FILTER1, uint16_t MASK1, uint16_t FILTER2, uint16_t FILTER3, uint16_t FILTER4, uint16_t FILTER5);
 
 
 //writes to a register
