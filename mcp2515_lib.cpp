@@ -250,7 +250,6 @@ unsigned char mcp2515_read_status ( void )
 }
 
 
-
 //get message from mcp2515
 CanMessage can_get_message ( void ) 
 { 
@@ -287,7 +286,7 @@ CanMessage can_get_message ( void )
     //read RXBnDLC
     unsigned char RXBnDLC = spi_putc(0x00);
 
-    // Should be & ox0F since we only want last byte?
+    // Should be & ox0F since we only want last 4 bits?
     p_message.length = RXBnDLC & 0xff; //message length is last four bits
     if (RXBnDLC & (1 << RTR)) //if message is a remote transmit request
     {
@@ -302,10 +301,6 @@ CanMessage can_get_message ( void )
     		p_message.data[i] = spi_putc(0x00);
     	}
     }
-
-    // Delete from here when working
-    
-    // Delete to here
 
     CAN_CS_HIGH //deselect mcp2515
    	return(p_message);

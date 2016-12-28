@@ -29,7 +29,6 @@
 //1/NBT = 250000
 #endif
 
-//doesn't work
 #if CAN_BAUDRATE==500000
 #define CNF1_Setting  0
 #define CNF2_Setting  ((1<<BTLMODE)|(6<<PHSEG10)|(1 << PRSEG0)) //PS1 = (6+1)TQ //PropSeg = (1+1)TQ
